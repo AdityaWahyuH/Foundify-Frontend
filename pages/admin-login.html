@@ -5,39 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Foundify</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-container { width: 100%; max-width: 400px; padding: 20px; }
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 2rem; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-top: 5px solid #dc2626;
+        }
+        h2 { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+            color: #dc2626; 
+            font-size: 1.8rem;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: #333; 
+            font-weight: 500; 
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 1rem; 
+            box-sizing: border-box; 
+        }
+        .form-group input:focus { outline: none; border-color: #dc2626; }
+        .btn-primary { 
+            width: 100%; 
+            background: linear-gradient(45deg, #dc2626, #b91c1c); 
+            color: white; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); 
+        }
+        .btn-primary:disabled { 
+            opacity: 0.7; 
+            cursor: not-allowed; 
+        }
+        p { text-align: center; margin-top: 1rem; color: #666; }
+        p a { color: #667eea; text-decoration: none; font-weight: 600; }
+        p a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-    <div class="container" style="padding-top: 100px;">
-        <div class="auth-container" style="max-width: 400px; margin: 0 auto;">
-            <div class="card">
-                <h2 style="text-align: center; margin-bottom: 2rem; color: #dc2626;">Admin Login</h2>
-                <form id="adminLoginForm">
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label>Email Admin</label>
-                        <input type="email" id="adminEmail" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <label>Password Admin</label>
-                        <input type="password" id="adminPassword" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; background: linear-gradient(45deg, #dc2626, #b91c1c);">Login Admin</button>
-                </form>
-                <p style="text-align: center; margin-top: 1rem;">
-                    <a href="login.html" style="color: #667eea;">Login User</a>
-                </p>
-            </div>
+    <div class="auth-container">
+        <div class="card">
+            <h2>🔐 Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label>📧 Email Admin</label>
+                    <input type="email" id="adminEmail" required placeholder="admin@foundify.com">
+                </div>
+                <div class="form-group">
+                    <label>🔑 Password Admin</label>
+                    <input type="password" id="adminPassword" required placeholder="admin123">
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    🚀 Login Admin
+                </button>
+            </form>
+            <p>
+                Login sebagai <a href="login.html">User Biasa</a>
+            </p>
         </div>
     </div>
 
-    <script src="../js/api.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/utils.js"></script>
     <script>
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('adminEmail').value;
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
-            await AuthManager.adminLogin(email, password);
+
+            // Loading state
+            loginBtn.textContent = '⏳ Login...';
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:8000/api/auth/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Login gagal');
+                }
+
+                // ✅ LOGIN SUKSES - SIMPAN TOKEN & REDIRECT
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('admin', JSON.stringify(data.admin || { nama: email, role: 'admin' }));
+                
+                alert('✅ Admin login berhasil!');
+                window.location.href = 'admin-dashboard.html';  // ← INI YANG KURANG!
+
+            } catch (error) {
+                console.error('Admin login error:', error);
+                alert('❌ Login gagal: ' + error.message);
+            } finally {
+                // Reset button
+                loginBtn.textContent = '🚀 Login Admin';
+                loginBtn.disabled = false;
+            }
         });
     </script>
 </body>
