@@ -1,0 +1,237 @@
+/* ===== Login Page Styles ===== */
+.login-body {
+  margin: 0;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+/* top bar (judul kiri + search kanan) */
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+  background: #fff;
+}
+
+.topbar__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #eef2f7;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
+  width: min(320px, 55vw);
+}
+
+.search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+}
+
+.search__btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: rgba(15, 23, 42, 0.60);
+  display: grid;
+  place-items: center;
+}
+
+/* center container */
+.login-wrap {
+  min-height: calc(100vh - 64px);
+  display: grid;
+  place-items: center;
+  padding: 28px 16px;
+}
+
+/* card */
+.login-card {
+  width: min(420px, 92vw);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 28px 28px 22px;
+}
+
+.login-card__head h1 {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.login-card__head p {
+  margin: 0 0 18px;
+  text-align: center;
+  color: rgba(15, 23, 42, 0.65);
+  line-height: 1.4;
+}
+
+/* form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(15, 23, 42, 0.70);
+  margin-bottom: 8px;
+}
+
+.field input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #eef2f7;
+  outline: none;
+  font-size: 14px;
+}
+
+.field input:focus {
+  border-color: rgba(91, 108, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(91, 108, 255, 0.12);
+  background: #f1f5ff;
+}
+
+.error {
+  display: block;
+  min-height: 16px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #ef4444;
+}
+
+/* password */
+.password {
+  position: relative;
+}
+
+.password__toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: rgba(15, 23, 42, 0.55);
+  padding: 6px;
+}
+
+.password__toggle:hover {
+  color: rgba(15, 23, 42, 0.75);
+}
+
+/* login button */
+.login-btn {
+  margin-top: 2px;
+  border: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: 800;
+  color: #fff;
+  background: #5b6cff;
+  box-shadow: 0 12px 22px rgba(91, 108, 255, 0.26);
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+.login-btn:active {
+  transform: translateY(1px);
+}
+
+.login-btn:hover {
+  background: #6a5cff;
+}
+
+/* divider OR */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 4px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: rgba(15, 23, 42, 0.10);
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.divider span {
+  display: inline-block;
+  padding: 0 10px;
+  font-size: 12px;
+  color: rgba(15, 23, 42, 0.55);
+  background: #fff;
+}
+
+/* google button */
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  color: rgba(15, 23, 42, 0.80);
+}
+
+.google-btn:hover {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.g-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* register text */
+.register-text {
+  margin: 2px 0 0;
+  text-align: left;
+  font-size: 14px;
+  color: rgba(15, 23, 42, 0.65);
+}
+
+.register-text a {
+  color: #5b6cff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.register-text a:hover {
+  text-decoration: underline;
+}
