@@ -25,7 +25,9 @@ if (auth) {
 }
 
 // --- 2) Dummy data items (banyak) ---
+// ✅ kategori tetap sama seperti yang kamu pakai
 const categories = ["Aksesoris", "Dokumen", "Elektronik", "Pakaian", "Lainnya"];
+
 const places = [
   "Parkiran Motor, Area 1",
   "Perpustakaan, Area 2",
@@ -35,23 +37,91 @@ const places = [
   "Lobby, Area 2"
 ];
 
+// ✅ MASTER: jenis barang + deskripsi per kategori & status
+const ITEM_MASTER = {
+  Aksesoris: {
+    LOST: [
+      { title: "Kehilangan Jam Tangan", desc: "Jam tangan warna hitam, tali karet, kemungkinan terjatuh." },
+      { title: "Kehilangan Kacamata", desc: "Kacamata minus frame hitam, terakhir terlihat di area umum." },
+      { title: "Kehilangan Cincin", desc: "Cincin perak polos, hilang setelah kegiatan." },
+    ],
+    FOUND: [
+      { title: "Ditemukan Gelang", desc: "Gelang stainless ditemukan di area sekitar." },
+      { title: "Ditemukan Kalung", desc: "Kalung rantai tipis tanpa liontin." },
+      { title: "Ditemukan Jam Tangan", desc: "Jam tangan analog, kondisi baik." },
+    ],
+  },
+
+  Dokumen: {
+    LOST: [
+      { title: "Kehilangan KTP", desc: "KTP kemungkinan tercecer, mohon dikembalikan jika ditemukan." },
+      { title: "Kehilangan SIM", desc: "SIM C hilang, terakhir dibawa saat bepergian." },
+      { title: "Kehilangan Kartu Mahasiswa", desc: "KTM universitas, hilang setelah jam kuliah." },
+    ],
+    FOUND: [
+      { title: "Ditemukan Kartu Mahasiswa", desc: "Kartu mahasiswa ditemukan di area kampus." },
+      { title: "Ditemukan KTP", desc: "KTP ditemukan, bisa diklaim dengan bukti identitas." },
+      { title: "Ditemukan SIM", desc: "SIM ditemukan dalam kondisi baik." },
+    ],
+  },
+
+  Elektronik: {
+    LOST: [
+      { title: "Kehilangan HP", desc: "HP Android warna hitam, casing transparan." },
+      { title: "Kehilangan Charger", desc: "Charger USB-C warna putih, kemungkinan tertinggal." },
+      { title: "Kehilangan Earphone", desc: "Earphone kabel, terselip di sekitar lokasi." },
+    ],
+    FOUND: [
+      { title: "Ditemukan Power Bank", desc: "Power bank 10.000mAh warna hitam." },
+      { title: "Ditemukan Charger", desc: "Charger ditemukan, silakan klaim dengan bukti." },
+      { title: "Ditemukan Earphone", desc: "Earphone ditemukan di kursi/area umum." },
+    ],
+  },
+
+  Pakaian: {
+    LOST: [
+      { title: "Kehilangan Jaket", desc: "Jaket hoodie warna abu-abu." },
+      { title: "Kehilangan Topi", desc: "Topi hitam tanpa logo." },
+      { title: "Kehilangan Sweater", desc: "Sweater warna coklat, kemungkinan tertinggal." },
+    ],
+    FOUND: [
+      { title: "Ditemukan Jaket", desc: "Jaket parasut warna biru." },
+      { title: "Ditemukan Topi", desc: "Topi ditemukan di area umum." },
+      { title: "Ditemukan Sweater", desc: "Sweater rajut ditemukan, kondisi baik." },
+    ],
+  },
+
+  Lainnya: {
+    LOST: [
+      { title: "Kehilangan Botol Minum", desc: "Botol minum stainless warna biru." },
+      { title: "Kehilangan Helm", desc: "Helm full face warna hitam." },
+      { title: "Kehilangan Kunci", desc: "Gantungan kunci warna merah, berisi beberapa kunci." },
+    ],
+    FOUND: [
+      { title: "Ditemukan Helm", desc: "Helm standar SNI ditemukan di parkiran." },
+      { title: "Ditemukan Botol Minum", desc: "Botol minum plastik warna hijau." },
+      { title: "Ditemukan Kunci", desc: "Kunci ditemukan, bisa diklaim dengan ciri-ciri." },
+    ],
+  },
+};
+
 function formatDate(d) {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   return `${months[d.getMonth()]} ${String(d.getDate()).padStart(2,"0")}`;
 }
 
+// ✅ DISESUAIKAN: makeItems sekarang pakai ITEM_MASTER untuk title + desc yang sesuai kategori
 function makeItems(count = 60) {
-  const lostTitles = ["Kehilangan Botol Minum", "Kehilangan Dompet", "Kehilangan Kunci", "Kehilangan HP", "Kehilangan Jaket"];
-  const foundTitles = ["Ditemukan Kartu Mahasiswa", "Ditemukan Dompet", "Ditemukan Charger", "Ditemukan Helm", "Ditemukan Kunci Motor"];
-
   const items = [];
   for (let i = 1; i <= count; i++) {
     const isLost = i % 2 === 0;
-    const titleBase = isLost
-      ? lostTitles[i % lostTitles.length]
-      : foundTitles[i % foundTitles.length];
 
     const cat = categories[i % categories.length];
+    const status = isLost ? "LOST" : "FOUND";
+
+    const pool = ITEM_MASTER[cat][status];
+    const pick = pool[i % pool.length];
+
     const loc = places[i % places.length];
 
     const dt = new Date();
@@ -59,8 +129,9 @@ function makeItems(count = 60) {
 
     items.push({
       id: i,
-      status: isLost ? "LOST" : "FOUND", // ✅ konsisten
-      title: `${titleBase} #${i}`,
+      status: status, // ✅ konsisten
+      title: `${pick.title} #${i}`,
+      description: pick.desc, // ✅ deskripsi
       category: cat,
       location: loc,
       date: formatDate(dt),
@@ -126,6 +197,7 @@ function applyFilters(items) {
     const okQ = qFilter
       ? (
           it.title.toLowerCase().includes(qFilter) ||
+          (it.description || "").toLowerCase().includes(qFilter) || // ✅ cari juga di deskripsi
           it.location.toLowerCase().includes(qFilter) ||
           it.category.toLowerCase().includes(qFilter)
         )
@@ -160,6 +232,18 @@ function cardTemplate(item) {
 
         <h3 class="title">${item.title}</h3>
 
+        <!-- ✅ tampilkan kategori -->
+        <div class="meta" style="margin-bottom:6px;">
+          <span class="meta__icon">🏷️</span>
+          <span>${item.category}</span>
+        </div>
+
+        <!-- ✅ tampilkan deskripsi -->
+        <div class="meta" style="align-items:flex-start;">
+          <span class="meta__icon">📝</span>
+          <span style="line-height:1.35;">${item.description || "-"}</span>
+        </div>
+
         <div class="meta">
           <span class="meta__icon">📍</span>
           <span>${item.location}</span>
@@ -185,9 +269,6 @@ function render() {
   resultMeta.textContent = `Menampilkan ${visible.length} dari ${filtered.length} item`;
 
   btnLoadMore.style.display = visible.length >= filtered.length ? "none" : "inline-flex";
-
-  // Debug (kalau mau cek status kebaca apa)
-  // console.log("STATUS:", getStatusFilter(), "LOC:", getLocationFilter(), "Q:", getQueryFilter());
 }
 
 // --- 5) Events ---
