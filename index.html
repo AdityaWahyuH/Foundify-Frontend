@@ -1,175 +1,68 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foundify - Temukan Barang Hilangmu</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-        }
-
-        .nav-brand {
-            font-size: 1.8rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links a {
-            margin-left: 2rem;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #667eea;
-        }
-
-        /* Hero Section */
-        .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 80px);
-            text-align: center;
-            color: white;
-            padding: 2rem;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        .btn-primary {
-            background: white;
-            color: #667eea;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.8s ease 0.4s both;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-
-        /* Features */
-        .features {
-            background: white;
-            padding: 4rem 2rem;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foundify - Landing</title>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-brand">🔍 Foundify</div>
-        <div class="nav-links">
-            <a href="pages/login.html">Login</a>
-            <a href="pages/register.html">Register</a>
-            <a href="pages/admin-login.html">Admin</a>
-        </div>
-    </nav>
+  <!-- Background -->
+  <div class="page">
+    <!-- Navbar -->
+    <header class="nav">
+      <div class="nav__brand" role="banner" aria-label="Brand">
+        <span class="brand__text">Foundify</span>
+      </div>
 
-    <!-- Hero Section -->
-    <main class="hero">
-        <h1>🎯 Temukan Barang Hilangmu</h1>
-        <p>Platform terpercaya untuk melapor dan menemukan barang hilang di kampus. Bantu sesama, dapatkan poin reward!</p>
-        <a href="pages/login.html" class="btn-primary">Mulai Sekarang →</a>
+      <nav class="nav__actions" aria-label="Aksi">
+        <button class="btn btn--ghost" id="btnRegister" type="button">Register</button>
+        <button class="btn btn--primary" id="btnLogin" type="button">Login</button>
+      </nav>
+    </header>
+
+    <!-- Main Hero -->
+    <main class="hero" aria-label="Landing Page">
+      <section class="hero__content">
+        <h1 class="hero__title">
+          Platform Digital Membantu<br />
+          Sebarkan Informasi Barang Hilang
+        </h1>
+
+        <p class="hero__subtitle">
+          Foundify menghubungkan penemu dan pemilik barang melalui satu platform digital<br />
+          untuk pencarian yang cepat, aman, dan transparan.
+        </p>
+
+        <div class="hero__cta">
+          <button class="btn btn--cta" id="btnStart" type="button">
+            <span class="btn__icon" aria-hidden="true">
+              <!-- Icon search (inline SVG) -->
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M10.5 18.5C14.9183 18.5 18.5 14.9183 18.5 10.5C18.5 6.08172 14.9183 2.5 10.5 2.5C6.08172 2.5 2.5 6.08172 2.5 10.5C2.5 14.9183 6.08172 18.5 10.5 18.5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M21.5 21.5L17.6 17.6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            <span>Mulai Temukan Barang!</span>
+          </button>
+        </div>
+      </section>
     </main>
+  </div>
 
-    <!-- Features Section -->
-    <section class="features">
-        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #333;">✨ Fitur Unggulan</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>📦 Lapor Barang Hilang</h3>
-                <p>Laporkan barang yang hilang dengan detail lengkap. Dapatkan notifikasi jika ada yang menemukan.</p>
-            </div>
-            <div class="feature-card">
-                <h3>🔍 Temukan & Laporkan</h3>
-                <p>Menemukan barang? Laporkan untuk membantu pemiliknya. Dapatkan poin reward sebagai apresiasi.</p>
-            </div>
-            <div class="feature-card">
-                <h3>⭐ Sistem Poin Reward</h3>
-                <p>Kumpulkan poin setiap kali membantu orang lain. Tukar poin dengan voucher menarik!</p>
-            </div>
-        </div>
-    </section>
-
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/utils.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>
