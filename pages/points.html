@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poin - Foundify</title>
+
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/points.css" />
+</head>
+<body class="dash-body">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar__brand"><div class="brand__text">Foundify</div></div>
+      <hr class="sidebar__hr" />
+      <div class="sidebar__section">
+        <div class="sidebar__label">MENU</div>
+        <a class="navitem" href="./dashboard.html"><span class="navitem__icon">🏠</span><span>Home</span></a>
+        <a class="navitem" href="./report.html"><span class="navitem__icon">➕</span><span>Buat Laporan</span></a>
+        <a class="navitem navitem--active" href="./points.html"><span class="navitem__icon">🪙</span><span>Poin Saya</span></a>
+        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;"><span class="navitem__icon">✅</span><span>Verifikasi Klaim</span></a>
+      </div>
+      <div class="sidebar__footer">
+        <button class="logout" id="btnLogout" type="button">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar__title">Poin Saya</div>
+        <div class="topbar__right">
+          <div class="userpill"><span class="userpill__dot"></span><span id="userPillText"></span></div>
+        </div>
+      </header>
+
+      <section class="points-wrap">
+        <div class="points-summary">
+          <div class="box">
+            <div class="label">Total Poin</div>
+            <div class="value" id="totalPoints">0</div>
+          </div>
+          <div class="box">
+            <div class="label">Riwayat</div>
+            <div class="value" id="totalHistory">0</div>
+          </div>
+        </div>
+
+        <div class="points-list" id="pointsList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/points.js"></script>
+</body>
+</html>
