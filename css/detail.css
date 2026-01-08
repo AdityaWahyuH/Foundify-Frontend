@@ -1,0 +1,75 @@
+.detail-wrap{ margin-top:14px; display:grid; gap:14px; }
+
+.detail-card{
+  background:#fff;
+  border:1px solid rgba(15,23,42,.12);
+  border-radius:12px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns: 360px 1fr;
+}
+
+.detail-media{
+  background:#eef2f7;
+  display:grid;
+  place-items:center;
+  min-height:260px;
+}
+.detail-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.detail-info{ padding:14px; }
+.detail-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.detail-info h2{ margin:0 0 6px; font-weight:900; }
+.muted{ color: rgba(15,23,42,.6); font-weight:700; margin:0 0 10px; }
+.detail-row{ display:flex; gap:10px; margin:8px 0; font-weight:800; color: rgba(15,23,42,.78); }
+
+.panel{
+  background:#fff;
+  border:1px solid rgba(15,23,42,.12);
+  border-radius:12px;
+  padding:14px;
+}
+.panel h3{ margin:0 0 8px; font-weight:900; }
+
+.field{ margin:10px 0; }
+.field label{ display:block; font-weight:900; margin-bottom:6px; }
+.field textarea, .field input{
+  width:100%; padding:10px 12px; border-radius:10px;
+  border:1px solid rgba(15,23,42,.12); outline:none;
+}
+.hint{ display:block; margin-top:6px; font-size:12px; font-weight:800; color: rgba(15,23,42,.55); }
+.err{ display:block; margin-top:6px; font-size:12px; font-weight:900; color:#ef4444; min-height:16px; }
+
+.preview{
+  border:1px dashed rgba(15,23,42,.18);
+  border-radius:12px;
+  padding:10px;
+  background: rgba(15,23,42,.02);
+}
+.preview img{ width:100%; max-height:220px; object-fit:cover; border-radius:10px; display:none; margin-top:10px; }
+
+.detail-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+.btn{
+  padding:10px 14px; border-radius:10px; font-weight:900;
+  border:1px solid rgba(15,23,42,.12); cursor:pointer; text-decoration:none;
+}
+.btn--ghost{ background:#fff; color: rgba(15,23,42,.75); }
+.btn--primary{ background: var(--primary); color:#fff; border:none; }
+.btn--primary:hover{ background: var(--primary2); }
+
+.toast{ margin-top:10px; font-weight:900; color:#16a34a; display:none; }
+
+.claims-list{ display:grid; gap:10px; margin-top:10px; }
+.claim-card{
+  border:1px solid rgba(15,23,42,.12);
+  border-radius:12px;
+  padding:12px;
+  background: rgba(15,23,42,.01);
+}
+.claim-card .row{ display:flex; justify-content:space-between; gap:10px; font-weight:800; }
+.claim-card .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
+.small{ font-size:12px; font-weight:800; color: rgba(15,23,42,.65); }
+
+@media (max-width: 980px){
+  .detail-card{ grid-template-columns: 1fr; }
+}

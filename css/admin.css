@@ -1,0 +1,28 @@
+.admin-wrap{ margin-top:14px; display:grid; gap:12px; }
+.toolbar{
+  display:flex; gap:10px; align-items:center;
+  background:#fff; border:1px solid rgba(15,23,42,.12); border-radius:12px; padding:12px;
+}
+.inputx{
+  flex:1;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.12);
+  outline:none;
+  font-weight:800;
+}
+.claims{ display:grid; gap:10px; }
+.claim{
+  background:#fff; border:1px solid rgba(15,23,42,.12);
+  border-radius:12px; padding:12px;
+}
+.claim .top{ display:flex; justify-content:space-between; gap:10px; font-weight:900; }
+.small{ font-size:12px; font-weight:800; color: rgba(15,23,42,.65); }
+.claim img{ width:100%; max-height:220px; object-fit:cover; border-radius:10px; margin-top:10px; }
+.actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:10px; }
+.btn{
+  padding:10px 14px; border-radius:10px; font-weight:900;
+  border:1px solid rgba(15,23,42,.12); cursor:pointer; text-decoration:none;
+}
+.btn--primary{ background: var(--primary); color:#fff; border:none; }
+.btn--ghost{ background:#fff; color: rgba(15,23,42,.75); }
