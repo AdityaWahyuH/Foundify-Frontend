@@ -24,10 +24,8 @@ if (auth) {
   }
 }
 
-// --- 2) Dummy data items (banyak) ---
-// ✅ kategori tetap sama seperti yang kamu pakai
+// --- 2) Dummy data items + kategori/deskripsi ---
 const categories = ["Aksesoris", "Dokumen", "Elektronik", "Pakaian", "Lainnya"];
-
 const places = [
   "Parkiran Motor, Area 1",
   "Perpustakaan, Area 2",
@@ -37,7 +35,6 @@ const places = [
   "Lobby, Area 2"
 ];
 
-// ✅ MASTER: jenis barang + deskripsi per kategori & status
 const ITEM_MASTER = {
   Aksesoris: {
     LOST: [
@@ -51,7 +48,6 @@ const ITEM_MASTER = {
       { title: "Ditemukan Jam Tangan", desc: "Jam tangan analog, kondisi baik." },
     ],
   },
-
   Dokumen: {
     LOST: [
       { title: "Kehilangan KTP", desc: "KTP kemungkinan tercecer, mohon dikembalikan jika ditemukan." },
@@ -64,7 +60,6 @@ const ITEM_MASTER = {
       { title: "Ditemukan SIM", desc: "SIM ditemukan dalam kondisi baik." },
     ],
   },
-
   Elektronik: {
     LOST: [
       { title: "Kehilangan HP", desc: "HP Android warna hitam, casing transparan." },
@@ -77,7 +72,6 @@ const ITEM_MASTER = {
       { title: "Ditemukan Earphone", desc: "Earphone ditemukan di kursi/area umum." },
     ],
   },
-
   Pakaian: {
     LOST: [
       { title: "Kehilangan Jaket", desc: "Jaket hoodie warna abu-abu." },
@@ -90,7 +84,6 @@ const ITEM_MASTER = {
       { title: "Ditemukan Sweater", desc: "Sweater rajut ditemukan, kondisi baik." },
     ],
   },
-
   Lainnya: {
     LOST: [
       { title: "Kehilangan Botol Minum", desc: "Botol minum stainless warna biru." },
@@ -110,42 +103,71 @@ function formatDate(d) {
   return `${months[d.getMonth()]} ${String(d.getDate()).padStart(2,"0")}`;
 }
 
-// ✅ DISESUAIKAN: makeItems sekarang pakai ITEM_MASTER untuk title + desc yang sesuai kategori
-function makeItems(count = 60) {
+function makeItems(count = 36) {
   const items = [];
   for (let i = 1; i <= count; i++) {
     const isLost = i % 2 === 0;
-
     const cat = categories[i % categories.length];
     const status = isLost ? "LOST" : "FOUND";
-
     const pool = ITEM_MASTER[cat][status];
     const pick = pool[i % pool.length];
 
     const loc = places[i % places.length];
-
     const dt = new Date();
     dt.setDate(dt.getDate() - (i % 15));
 
     items.push({
-      id: i,
-      status: status, // ✅ konsisten
+      id: `dummy-${i}`,
+      status,
       title: `${pick.title} #${i}`,
-      description: pick.desc, // ✅ deskripsi
+      description: pick.desc,
       category: cat,
       location: loc,
       date: formatDate(dt),
-      author: (auth && auth.username) ? auth.username : "admin",
+      author: "system",
       coins: (i % 5 + 1) * 10,
       image: null,
+      source: "dummy"
     });
   }
   return items;
 }
 
-let ALL_ITEMS = makeItems(60);
+// --- localStorage helpers ---
+function readJSON(key, fallback) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return fallback;
+  try { return JSON.parse(raw); } catch { return fallback; }
+}
 
-// --- 3) DOM Refs ---
+function getReports() {
+  // report.js menyimpan di foundify_reports
+  return readJSON("foundify_reports", []);
+}
+
+// --- 3) Gabungkan dummy + laporan user ---
+function buildAllItems() {
+  const dummy = makeItems(36);
+  const reports = getReports().map(r => ({
+    id: r.id,                       // numeric timestamp
+    status: r.status,
+    title: r.title,
+    description: r.description,
+    category: r.category,
+    location: r.location,
+    date: new Date(r.date).toLocaleDateString("en-US", { month:"short", day:"2-digit" }).replace(",", ""),
+    author: r.author,
+    coins: r.coins ?? 10,
+    image: r.image || null,
+    source: "report"
+  }));
+  // report paling baru di atas
+  return [...reports, ...dummy];
+}
+
+let ALL_ITEMS = buildAllItems();
+
+// --- 4) DOM Refs ---
 const grid = document.getElementById("itemsGrid");
 const resultMeta = document.getElementById("resultMeta");
 const btnLoadMore = document.getElementById("btnLoadMore");
@@ -157,25 +179,19 @@ const btnSearch = document.getElementById("btnSearch");
 const globalSearch = document.getElementById("globalSearch");
 const globalSearchBtn = document.getElementById("globalSearchBtn");
 
-// --- 4) Pagination ---
+// --- 5) Pagination ---
 let pageSize = 9;
 let page = 1;
 
 // Filter state
-let currentFilters = {
-  category: null,
-  q: "",
-};
+let currentFilters = { category: null, q: "" };
 
-// ✅ selalu ambil status & lokasi langsung dari DOM biar pasti kebaca
 function getStatusFilter() {
-  return (statusSelect?.value || "ALL").toUpperCase().trim(); // ALL/FOUND/LOST
+  return (statusSelect?.value || "ALL").toUpperCase().trim();
 }
-
 function getLocationFilter() {
   return (locationInput?.value || "").toLowerCase().trim();
 }
-
 function getQueryFilter() {
   return (currentFilters.q || "").toLowerCase().trim();
 }
@@ -189,22 +205,19 @@ function applyFilters(items) {
   return items.filter((it) => {
     const itemStatus = (it.status || "").toUpperCase();
 
-    // ✅ Filter status bener: FOUND hanya FOUND, LOST hanya LOST
     const okStatus = statusFilter === "ALL" ? true : itemStatus === statusFilter;
-
     const okLoc = locFilter ? it.location.toLowerCase().includes(locFilter) : true;
 
     const okQ = qFilter
       ? (
           it.title.toLowerCase().includes(qFilter) ||
-          (it.description || "").toLowerCase().includes(qFilter) || // ✅ cari juga di deskripsi
+          (it.description || "").toLowerCase().includes(qFilter) ||
           it.location.toLowerCase().includes(qFilter) ||
           it.category.toLowerCase().includes(qFilter)
         )
       : true;
 
     const okCat = catFilter ? it.category === catFilter : true;
-
     return okStatus && okLoc && okQ && okCat;
   });
 }
@@ -217,11 +230,17 @@ function cardTemplate(item) {
   return `
     <article class="card" data-id="${item.id}">
       <div class="card__img" aria-hidden="true">
-        <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-          <path d="M21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19Z" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M8 10C8.55228 10 9 9.55228 9 9C9 8.44772 8.55228 8 8 8C7.44772 8 7 8.44772 7 9C7 9.55228 7.44772 10 8 10Z" fill="currentColor"/>
-          <path d="M21 16L16 11L5 21" stroke="currentColor" stroke-width="1.6"/>
-        </svg>
+        ${
+          item.image
+            ? `<img src="${item.image}" alt="Gambar item" style="width:100%;height:100%;object-fit:cover;display:block;" />`
+            : `
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
+                <path d="M21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19Z" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M8 10C8.55228 10 9 9.55228 9 9C9 8.44772 8.55228 8 8 8C7.44772 8 7 8.44772 7 9C7 9.55228 7.44772 10 8 10Z" fill="currentColor"/>
+                <path d="M21 16L16 11L5 21" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
+            `
+        }
       </div>
 
       <div class="card__body">
@@ -232,13 +251,11 @@ function cardTemplate(item) {
 
         <h3 class="title">${item.title}</h3>
 
-        <!-- ✅ tampilkan kategori -->
         <div class="meta" style="margin-bottom:6px;">
           <span class="meta__icon">🏷️</span>
           <span>${item.category}</span>
         </div>
 
-        <!-- ✅ tampilkan deskripsi -->
         <div class="meta" style="align-items:flex-start;">
           <span class="meta__icon">📝</span>
           <span style="line-height:1.35;">${item.description || "-"}</span>
@@ -262,35 +279,26 @@ function cardTemplate(item) {
 }
 
 function render() {
+  // rebuild agar report baru langsung kebaca (kalau balik dari report.html)
+  ALL_ITEMS = buildAllItems();
+
   const filtered = applyFilters(ALL_ITEMS);
   const visible = filtered.slice(0, page * pageSize);
 
   grid.innerHTML = visible.map(cardTemplate).join("");
   resultMeta.textContent = `Menampilkan ${visible.length} dari ${filtered.length} item`;
-
   btnLoadMore.style.display = visible.length >= filtered.length ? "none" : "inline-flex";
 }
 
-// --- 5) Events ---
-// ✅ Dropdown status berubah -> langsung filter
-statusSelect.addEventListener("change", () => {
-  page = 1;
-  render();
-});
+// --- 6) Events ---
+statusSelect.addEventListener("change", () => { page = 1; render(); });
+btnSearch.addEventListener("click", () => { page = 1; render(); });
 
-// Tombol search -> apply lokasi (status tetap ikut)
-btnSearch.addEventListener("click", () => {
-  page = 1;
-  render();
-});
-
-// Global search
 globalSearchBtn.addEventListener("click", () => {
   currentFilters.q = globalSearch.value.trim();
   page = 1;
   render();
 });
-
 globalSearch.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     currentFilters.q = e.target.value.trim();
@@ -299,13 +307,8 @@ globalSearch.addEventListener("keydown", (e) => {
   }
 });
 
-// Load more
-btnLoadMore.addEventListener("click", () => {
-  page += 1;
-  render();
-});
+btnLoadMore.addEventListener("click", () => { page += 1; render(); });
 
-// Filter kategori
 document.querySelectorAll(".cat").forEach((btn) => {
   btn.addEventListener("click", () => {
     const cat = btn.getAttribute("data-cat");
@@ -321,12 +324,12 @@ document.getElementById("btnLogout").addEventListener("click", () => {
   window.location.href = "../index.html";
 });
 
-// Klik card -> detail placeholder
+// Klik card -> buka detail
 grid.addEventListener("click", (e) => {
   const card = e.target.closest(".card");
   if (!card) return;
   const id = card.getAttribute("data-id");
-  alert(`Buka detail item ID: ${id} (halaman detail next step)`);
+  window.location.href = `./detail.html?id=${encodeURIComponent(id)}`;
 });
 
 // initial render

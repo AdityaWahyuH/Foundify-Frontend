@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detail Barang - Foundify</title>
+
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/detail.css" />
+</head>
+<body class="dash-body">
+  <div class="layout">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="sidebar__brand">
+        <div class="brand__text">Foundify</div>
+      </div>
+      <hr class="sidebar__hr" />
+      <div class="sidebar__section">
+        <div class="sidebar__label">MENU</div>
+        <a class="navitem" href="./dashboard.html">
+          <span class="navitem__icon">🏠</span><span>Home</span>
+        </a>
+        <a class="navitem" href="./report.html">
+          <span class="navitem__icon">➕</span><span>Buat Laporan / Report</span>
+        </a>
+        <a class="navitem" href="./points.html">
+          <span class="navitem__icon">🪙</span><span>Poin Saya</span>
+        </a>
+        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;">
+          <span class="navitem__icon">✅</span><span>Verifikasi Klaim</span>
+        </a>
+      </div>
+      <div class="sidebar__footer">
+        <button class="logout" id="btnLogout" type="button">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar__title">Detail Barang</div>
+        <div class="topbar__right">
+          <div class="userpill" title="Akun yang sedang login">
+            <span class="userpill__dot"></span>
+            <span id="userPillText">user</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="detail-wrap">
+        <div class="detail-card">
+          <div class="detail-media" id="detailMedia"></div>
+
+          <div class="detail-info">
+            <div class="detail-top">
+              <span id="badge" class="badge">STATUS</span>
+              <span id="date" class="date"></span>
+            </div>
+
+            <h2 id="title">-</h2>
+            <p class="muted" id="category">-</p>
+
+            <div class="detail-row"><span>📝</span><span id="desc">-</span></div>
+            <div class="detail-row"><span>📍</span><span id="loc">-</span></div>
+            <div class="detail-row"><span>👤</span><span id="author">-</span></div>
+            <div class="detail-row"><span>🪙</span><span id="coins">-</span></div>
+
+            <div class="detail-actions">
+              <a class="btn btn--ghost" href="./dashboard.html">Kembali</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Ajukan Klaim Kepemilikan</h3>
+          <p class="muted">Isi bukti klaim. Klaim akan masuk status <b>PENDING</b> dan diverifikasi oleh Admin.</p>
+
+          <form id="claimForm" class="claim-form">
+            <div class="field">
+              <label>Alasan / Bukti Kepemilikan</label>
+              <textarea id="claimText" rows="4" placeholder="Contoh: ciri detail barang, isi dompet, nomor seri, dll" required></textarea>
+              <small class="err" id="errText"></small>
+            </div>
+
+            <div class="field">
+              <label>Upload Bukti (opsional)</label>
+              <input id="claimFile" type="file" accept="image/png,image/jpeg,image/jpg" />
+              <small class="hint">JPG/PNG, maks 2MB.</small>
+              <small class="err" id="errFile"></small>
+            </div>
+
+            <div class="preview" id="proofPreview">
+              <span class="muted">Preview bukti klaim</span>
+              <img id="proofImg" alt="preview bukti" />
+            </div>
+
+            <div class="detail-actions">
+              <button type="submit" class="btn btn--primary">Kirim Klaim</button>
+            </div>
+
+            <div class="toast" id="toast"></div>
+          </form>
+        </div>
+
+        <div class="panel" id="adminPanel" style="display:none;">
+          <h3>Admin: Klaim untuk Item Ini</h3>
+          <div id="adminClaimsList" class="claims-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/detail.js"></script>
+</body>
+</html>
