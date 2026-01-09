@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Reward - Foundify</title>
+
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/admin-rewards.css" />
+</head>
+<body class="dash-body">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar__brand"><div class="brand__text">Foundify</div></div>
+      <hr class="sidebar__hr" />
+      <div class="sidebar__section">
+        <div class="sidebar__label">ADMIN</div>
+        <a class="navitem" href="./dashboard.html"><span class="navitem__icon">🏠</span><span>Home</span></a>
+        <a class="navitem" href="./admin-claims.html"><span class="navitem__icon">✅</span><span>Verifikasi Klaim</span></a>
+        <a class="navitem navitem--active" href="./admin-rewards.html"><span class="navitem__icon">🛠️</span><span>Admin Reward</span></a>
+        <a class="navitem" href="./admin-redemptions.html"><span class="navitem__icon">🧾</span><span>Verifikasi Penukaran</span></a>
+        <a class="navitem" href="./notifications.html"><span class="navitem__icon">🔔</span><span>Notifikasi</span></a>
+      </div>
+      <div class="sidebar__footer">
+        <button class="logout" id="btnLogout" type="button">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar__title">Admin - Reward</div>
+        <div class="topbar__right">
+          <div class="userpill"><span class="userpill__dot"></span><span id="userPillText"></span></div>
+        </div>
+      </header>
+
+      <section class="admin-wrap">
+        <div class="panel">
+          <h3>Tambah / Edit Reward</h3>
+          <form id="form" class="form">
+            <input type="hidden" id="rid" />
+
+            <div class="grid2">
+              <div class="field">
+                <label>Nama Reward</label>
+                <input id="name" placeholder="Contoh: Voucher Kantin 10k" required />
+              </div>
+              <div class="field">
+                <label>Harga (poin)</label>
+                <input id="price" type="number" min="0" step="1" placeholder="50" required />
+              </div>
+            </div>
+
+            <div class="grid2">
+              <div class="field">
+                <label>Stok</label>
+                <input id="stock" type="number" min="0" step="1" placeholder="10" required />
+              </div>
+              <div class="field">
+                <label>Upload gambar (opsional)</label>
+                <input id="image" type="file" accept="image/png,image/jpeg,image/jpg" />
+                <small class="hint">JPG/PNG maks 2MB</small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Deskripsi</label>
+              <textarea id="desc" rows="3" placeholder="Deskripsi reward..." required></textarea>
+            </div>
+
+            <div class="preview">
+              <span class="hint">Preview</span>
+              <img id="imgTag" alt="preview" />
+            </div>
+
+            <div class="actions">
+              <button class="btn btn--ghost" id="btnReset" type="button">Reset</button>
+              <button class="btn btn--primary" type="submit">Simpan</button>
+            </div>
+
+            <div class="toast" id="toast"></div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Daftar Reward</h3>
+            <input id="q" class="inputx" placeholder="Cari..." />
+          </div>
+          <div id="list" class="list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="../js/admin-rewards.js"></script>
+</body>
+</html>

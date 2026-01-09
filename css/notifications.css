@@ -1,0 +1,21 @@
+.notif-wrap{ margin-top:14px; }
+.btn-mini{
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.12);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.notif-list{ display:grid; gap:10px; }
+.notif{
+  background:#fff;
+  border:1px solid rgba(15,23,42,.12);
+  border-radius:12px;
+  padding:12px;
+}
+.notif.unread{ border-color: rgba(99,102,241,.45); box-shadow: 0 0 0 2px rgba(99,102,241,.08); }
+.notif .top{ display:flex; justify-content:space-between; gap:10px; }
+.notif .title{ font-weight:1000; }
+.small{ font-size:12px; font-weight:800; color: rgba(15,23,42,.65); }
+.msg{ margin-top:6px; font-weight:800; color: rgba(15,23,42,.78); line-height:1.35; }

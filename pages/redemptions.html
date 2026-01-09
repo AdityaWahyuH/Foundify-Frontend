@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riwayat Tukar - Foundify</title>
+
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/redemptions.css" />
+</head>
+<body class="dash-body">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar__brand"><div class="brand__text">Foundify</div></div>
+      <hr class="sidebar__hr" />
+      <div class="sidebar__section">
+        <div class="sidebar__label">MENU</div>
+        <a class="navitem" href="./dashboard.html"><span class="navitem__icon">🏠</span><span>Home</span></a>
+        <a class="navitem" href="./report.html"><span class="navitem__icon">➕</span><span>Buat Laporan</span></a>
+        <a class="navitem" href="./rewards.html"><span class="navitem__icon">🎁</span><span>Katalog Reward</span></a>
+        <a class="navitem navitem--active" href="./redemptions.html"><span class="navitem__icon">🧾</span><span>Riwayat Tukar</span></a>
+        <a class="navitem" href="./points.html"><span class="navitem__icon">🪙</span><span>Poin Saya</span></a>
+        <a class="navitem" href="./notifications.html"><span class="navitem__icon">🔔</span><span>Notifikasi</span></a>
+
+        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;"><span class="navitem__icon">✅</span><span>Verifikasi Klaim</span></a>
+        <a class="navitem" href="./admin-rewards.html" id="adminRewardsLink" style="display:none;"><span class="navitem__icon">🛠️</span><span>Admin Reward</span></a>
+        <a class="navitem" href="./admin-redemptions.html" id="adminRedeemLink" style="display:none;"><span class="navitem__icon">🧾</span><span>Verifikasi Penukaran</span></a>
+      </div>
+
+      <div class="sidebar__footer">
+        <button class="logout" id="btnLogout" type="button">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar__title">Riwayat Tukar</div>
+        <div class="topbar__right">
+          <div class="userpill"><span class="userpill__dot"></span><span id="userPillText"></span></div>
+        </div>
+      </header>
+
+      <section class="redeem-wrap">
+        <div class="toolbar">
+          <select id="filterStatus" class="select">
+            <option value="ALL">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+          <input id="q" class="inputx" placeholder="Cari reward..." />
+        </div>
+
+        <div id="list" class="redeem-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="../js/redemptions.js"></script>
+</body>
+</html>

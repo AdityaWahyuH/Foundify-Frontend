@@ -1,30 +1,33 @@
 // ===== Dashboard (Home) - Foundify =====
+import { requireAuth, logout } from "./utils.js";
 
 // --- 1) Auth Guard: hanya bisa akses jika login ---
-function getAuth() {
-  const raw = localStorage.getItem("foundify_auth");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-function requireAuth() {
-  const auth = getAuth();
-  if (!auth || !auth.token) {
-    window.location.href = "../pages/login.html";
-    return null;
-  }
-  return auth;
-}
-
 const auth = requireAuth();
-if (auth) {
-  const userPillText = document.getElementById("userPillText");
-  if (userPillText) {
-    userPillText.textContent = `${auth.username || "user"} (${auth.role || "user"})`;
-  }
+if (!auth) {
+  // requireAuth sudah redirect
+  throw new Error("Unauthorized");
 }
 
-// --- 2) Dummy data items + kategori/deskripsi ---
+// Topbar user
+const userPillText = document.getElementById("userPillText");
+if (userPillText) {
+  userPillText.textContent = `${auth.username || "user"} (${auth.role || "user"})`;
+}
+
+// Show admin menus if role admin
+if (auth.role === "admin") {
+  const a1 = document.getElementById("adminClaimsLink");
+  const a2 = document.getElementById("adminRewardsLink");
+  const a3 = document.getElementById("adminRedeemLink");
+  if (a1) a1.style.display = "flex";
+  if (a2) a2.style.display = "flex";
+  if (a3) a3.style.display = "flex";
+}
+
+// Logout
+document.getElementById("btnLogout").addEventListener("click", logout);
+
+// --- 2) Dummy data items: kategori & deskripsi sesuai ---
 const categories = ["Aksesoris", "Dokumen", "Elektronik", "Pakaian", "Lainnya"];
 const places = [
   "Parkiran Motor, Area 1",
@@ -35,67 +38,67 @@ const places = [
   "Lobby, Area 2"
 ];
 
-const ITEM_MASTER = {
+const categoryTemplates = {
   Aksesoris: {
-    LOST: [
-      { title: "Kehilangan Jam Tangan", desc: "Jam tangan warna hitam, tali karet, kemungkinan terjatuh." },
-      { title: "Kehilangan Kacamata", desc: "Kacamata minus frame hitam, terakhir terlihat di area umum." },
-      { title: "Kehilangan Cincin", desc: "Cincin perak polos, hilang setelah kegiatan." },
+    lost: [
+      { t: "Kehilangan Cincin", d: "Cincin perak kecil, kemungkinan jatuh saat aktivitas." },
+      { t: "Kehilangan Jam Tangan", d: "Jam tangan analog, strap hitam, terakhir terlihat sore." },
+      { t: "Kehilangan Kalung", d: "Kalung rantai tipis warna silver, mohon dibantu." }
     ],
-    FOUND: [
-      { title: "Ditemukan Gelang", desc: "Gelang stainless ditemukan di area sekitar." },
-      { title: "Ditemukan Kalung", desc: "Kalung rantai tipis tanpa liontin." },
-      { title: "Ditemukan Jam Tangan", desc: "Jam tangan analog, kondisi baik." },
+    found: [
+      { t: "Ditemukan Gelang", d: "Gelang rantai kecil ditemukan dekat area umum." },
+      { t: "Ditemukan Jam Tangan", d: "Jam tangan ditemukan di bangku, kondisi masih bagus." },
+      { t: "Ditemukan Cincin", d: "Cincin ditemukan di lantai, diamankan untuk pemilik." }
     ],
   },
   Dokumen: {
-    LOST: [
-      { title: "Kehilangan KTP", desc: "KTP kemungkinan tercecer, mohon dikembalikan jika ditemukan." },
-      { title: "Kehilangan SIM", desc: "SIM C hilang, terakhir dibawa saat bepergian." },
-      { title: "Kehilangan Kartu Mahasiswa", desc: "KTM universitas, hilang setelah jam kuliah." },
+    lost: [
+      { t: "Kehilangan Kartu Mahasiswa", d: "KTM atas nama belum diketahui, butuh segera." },
+      { t: "Kehilangan STNK", d: "STNK motor tertinggal, kemungkinan di parkiran." },
+      { t: "Kehilangan Dompet Berisi KTP", d: "Dompet berisi identitas, mohon info jika menemukan." }
     ],
-    FOUND: [
-      { title: "Ditemukan Kartu Mahasiswa", desc: "Kartu mahasiswa ditemukan di area kampus." },
-      { title: "Ditemukan KTP", desc: "KTP ditemukan, bisa diklaim dengan bukti identitas." },
-      { title: "Ditemukan SIM", desc: "SIM ditemukan dalam kondisi baik." },
+    found: [
+      { t: "Ditemukan Kartu Mahasiswa", d: "KTM ditemukan di lorong, diamankan di admin." },
+      { t: "Ditemukan KTP", d: "KTP ditemukan dekat kantin, siap diverifikasi." },
+      { t: "Ditemukan Surat Kendaraan", d: "Dokumen kendaraan ditemukan, mohon klaim dengan bukti." }
     ],
   },
   Elektronik: {
-    LOST: [
-      { title: "Kehilangan HP", desc: "HP Android warna hitam, casing transparan." },
-      { title: "Kehilangan Charger", desc: "Charger USB-C warna putih, kemungkinan tertinggal." },
-      { title: "Kehilangan Earphone", desc: "Earphone kabel, terselip di sekitar lokasi." },
+    lost: [
+      { t: "Kehilangan Earphone", d: "Earphone TWS warna putih, kemungkinan tertinggal." },
+      { t: "Kehilangan Charger", d: "Charger HP tertinggal di meja, kabel putih." },
+      { t: "Kehilangan HP", d: "HP hilang, terakhir digunakan di area kampus." }
     ],
-    FOUND: [
-      { title: "Ditemukan Power Bank", desc: "Power bank 10.000mAh warna hitam." },
-      { title: "Ditemukan Charger", desc: "Charger ditemukan, silakan klaim dengan bukti." },
-      { title: "Ditemukan Earphone", desc: "Earphone ditemukan di kursi/area umum." },
+    found: [
+      { t: "Ditemukan Earphone", d: "Earphone ditemukan di kursi, sudah diamankan." },
+      { t: "Ditemukan Charger", d: "Charger ditemukan di stop kontak, silakan klaim." },
+      { t: "Ditemukan Powerbank", d: "Powerbank ditemukan di perpustakaan, kondisi normal." }
     ],
   },
   Pakaian: {
-    LOST: [
-      { title: "Kehilangan Jaket", desc: "Jaket hoodie warna abu-abu." },
-      { title: "Kehilangan Topi", desc: "Topi hitam tanpa logo." },
-      { title: "Kehilangan Sweater", desc: "Sweater warna coklat, kemungkinan tertinggal." },
+    lost: [
+      { t: "Kehilangan Jaket", d: "Jaket warna gelap, tertinggal saat kegiatan." },
+      { t: "Kehilangan Helm", d: "Helm tertinggal di area parkir, mohon konfirmasi." },
+      { t: "Kehilangan Topi", d: "Topi warna hitam, kemungkinan jatuh di jalan." }
     ],
-    FOUND: [
-      { title: "Ditemukan Jaket", desc: "Jaket parasut warna biru." },
-      { title: "Ditemukan Topi", desc: "Topi ditemukan di area umum." },
-      { title: "Ditemukan Sweater", desc: "Sweater rajut ditemukan, kondisi baik." },
+    found: [
+      { t: "Ditemukan Jaket", d: "Jaket ditemukan di kursi, diamankan sementara." },
+      { t: "Ditemukan Helm", d: "Helm ditemukan di parkiran, siap diverifikasi." },
+      { t: "Ditemukan Hoodie", d: "Hoodie ditemukan di lobby, mohon klaim dengan bukti." }
     ],
   },
   Lainnya: {
-    LOST: [
-      { title: "Kehilangan Botol Minum", desc: "Botol minum stainless warna biru." },
-      { title: "Kehilangan Helm", desc: "Helm full face warna hitam." },
-      { title: "Kehilangan Kunci", desc: "Gantungan kunci warna merah, berisi beberapa kunci." },
+    lost: [
+      { t: "Kehilangan Botol Minum", d: "Botol minum tertinggal, warna netral, mohon dibantu." },
+      { t: "Kehilangan Kunci", d: "Kunci motor/rumah hilang, kemungkinan jatuh." },
+      { t: "Kehilangan Payung", d: "Payung lipat tertinggal setelah hujan." }
     ],
-    FOUND: [
-      { title: "Ditemukan Helm", desc: "Helm standar SNI ditemukan di parkiran." },
-      { title: "Ditemukan Botol Minum", desc: "Botol minum plastik warna hijau." },
-      { title: "Ditemukan Kunci", desc: "Kunci ditemukan, bisa diklaim dengan ciri-ciri." },
+    found: [
+      { t: "Ditemukan Botol Minum", d: "Botol minum ditemukan di meja, diamankan." },
+      { t: "Ditemukan Kunci", d: "Kunci ditemukan di lantai, silakan klaim." },
+      { t: "Ditemukan Payung", d: "Payung lipat ditemukan, bisa diambil setelah verifikasi." }
     ],
-  },
+  }
 };
 
 function formatDate(d) {
@@ -103,71 +106,41 @@ function formatDate(d) {
   return `${months[d.getMonth()]} ${String(d.getDate()).padStart(2,"0")}`;
 }
 
-function makeItems(count = 36) {
+function pickFrom(arr, i) {
+  return arr[i % arr.length];
+}
+
+function makeItems(count = 60) {
   const items = [];
   for (let i = 1; i <= count; i++) {
     const isLost = i % 2 === 0;
-    const cat = categories[i % categories.length];
-    const status = isLost ? "LOST" : "FOUND";
-    const pool = ITEM_MASTER[cat][status];
-    const pick = pool[i % pool.length];
-
+    const category = categories[i % categories.length];
     const loc = places[i % places.length];
+    const templatePool = isLost ? categoryTemplates[category].lost : categoryTemplates[category].found;
+    const tpl = pickFrom(templatePool, i);
+
     const dt = new Date();
     dt.setDate(dt.getDate() - (i % 15));
 
     items.push({
-      id: `dummy-${i}`,
-      status,
-      title: `${pick.title} #${i}`,
-      description: pick.desc,
-      category: cat,
+      id: i,
+      status: isLost ? "LOST" : "FOUND",
+      title: `${tpl.t} #${i}`,
+      description: tpl.d,
+      category,
       location: loc,
       date: formatDate(dt),
-      author: "system",
+      author: (auth && auth.username) ? auth.username : "user",
       coins: (i % 5 + 1) * 10,
       image: null,
-      source: "dummy"
     });
   }
   return items;
 }
 
-// --- localStorage helpers ---
-function readJSON(key, fallback) {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try { return JSON.parse(raw); } catch { return fallback; }
-}
+let ALL_ITEMS = makeItems(60);
 
-function getReports() {
-  // report.js menyimpan di foundify_reports
-  return readJSON("foundify_reports", []);
-}
-
-// --- 3) Gabungkan dummy + laporan user ---
-function buildAllItems() {
-  const dummy = makeItems(36);
-  const reports = getReports().map(r => ({
-    id: r.id,                       // numeric timestamp
-    status: r.status,
-    title: r.title,
-    description: r.description,
-    category: r.category,
-    location: r.location,
-    date: new Date(r.date).toLocaleDateString("en-US", { month:"short", day:"2-digit" }).replace(",", ""),
-    author: r.author,
-    coins: r.coins ?? 10,
-    image: r.image || null,
-    source: "report"
-  }));
-  // report paling baru di atas
-  return [...reports, ...dummy];
-}
-
-let ALL_ITEMS = buildAllItems();
-
-// --- 4) DOM Refs ---
+// --- 3) DOM Refs ---
 const grid = document.getElementById("itemsGrid");
 const resultMeta = document.getElementById("resultMeta");
 const btnLoadMore = document.getElementById("btnLoadMore");
@@ -179,15 +152,17 @@ const btnSearch = document.getElementById("btnSearch");
 const globalSearch = document.getElementById("globalSearch");
 const globalSearchBtn = document.getElementById("globalSearchBtn");
 
-// --- 5) Pagination ---
+// --- 4) Pagination + Filter State ---
 let pageSize = 9;
 let page = 1;
 
-// Filter state
-let currentFilters = { category: null, q: "" };
+let currentFilters = {
+  category: null,
+  q: "",
+};
 
 function getStatusFilter() {
-  return (statusSelect?.value || "ALL").toUpperCase().trim();
+  return (statusSelect?.value || "ALL").toUpperCase().trim(); // ALL/FOUND/LOST
 }
 function getLocationFilter() {
   return (locationInput?.value || "").toLowerCase().trim();
@@ -205,9 +180,13 @@ function applyFilters(items) {
   return items.filter((it) => {
     const itemStatus = (it.status || "").toUpperCase();
 
+    // ✅ Status filter fix
     const okStatus = statusFilter === "ALL" ? true : itemStatus === statusFilter;
+
+    // lokasi
     const okLoc = locFilter ? it.location.toLowerCase().includes(locFilter) : true;
 
+    // global search (title/desc/location/category)
     const okQ = qFilter
       ? (
           it.title.toLowerCase().includes(qFilter) ||
@@ -217,30 +196,31 @@ function applyFilters(items) {
         )
       : true;
 
+    // kategori sidebar
     const okCat = catFilter ? it.category === catFilter : true;
+
     return okStatus && okLoc && okQ && okCat;
   });
 }
 
+// Card template (tambah deskripsi)
 function cardTemplate(item) {
   const isFound = item.status === "FOUND";
   const badgeClass = isFound ? "badge badge--found" : "badge";
   const badgeText = isFound ? "FOUND" : "LOST";
 
+  // Deskripsi singkat (agar rapi)
+  const desc = (item.description || "").trim();
+  const shortDesc = desc.length > 70 ? desc.slice(0, 70) + "..." : desc;
+
   return `
     <article class="card" data-id="${item.id}">
       <div class="card__img" aria-hidden="true">
-        ${
-          item.image
-            ? `<img src="${item.image}" alt="Gambar item" style="width:100%;height:100%;object-fit:cover;display:block;" />`
-            : `
-              <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-                <path d="M21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19Z" stroke="currentColor" stroke-width="1.6"/>
-                <path d="M8 10C8.55228 10 9 9.55228 9 9C9 8.44772 8.55228 8 8 8C7.44772 8 7 8.44772 7 9C7 9.55228 7.44772 10 8 10Z" fill="currentColor"/>
-                <path d="M21 16L16 11L5 21" stroke="currentColor" stroke-width="1.6"/>
-              </svg>
-            `
-        }
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
+          <path d="M21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19Z" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M8 10C8.55228 10 9 9.55228 9 9C9 8.44772 8.55228 8 8 8C7.44772 8 7 8.44772 7 9C7 9.55228 7.44772 10 8 10Z" fill="currentColor"/>
+          <path d="M21 16L16 11L5 21" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
       </div>
 
       <div class="card__body">
@@ -251,19 +231,19 @@ function cardTemplate(item) {
 
         <h3 class="title">${item.title}</h3>
 
-        <div class="meta" style="margin-bottom:6px;">
+        <div class="meta">
+          <span class="meta__icon">📍</span>
+          <span>${item.location}</span>
+        </div>
+
+        <div class="meta" style="margin-top:6px;">
           <span class="meta__icon">🏷️</span>
           <span>${item.category}</span>
         </div>
 
-        <div class="meta" style="align-items:flex-start;">
+        <div class="meta" style="margin-top:6px;">
           <span class="meta__icon">📝</span>
-          <span style="line-height:1.35;">${item.description || "-"}</span>
-        </div>
-
-        <div class="meta">
-          <span class="meta__icon">📍</span>
-          <span>${item.location}</span>
+          <span>${shortDesc}</span>
         </div>
 
         <div class="card__bottom">
@@ -279,21 +259,27 @@ function cardTemplate(item) {
 }
 
 function render() {
-  // rebuild agar report baru langsung kebaca (kalau balik dari report.html)
-  ALL_ITEMS = buildAllItems();
-
   const filtered = applyFilters(ALL_ITEMS);
   const visible = filtered.slice(0, page * pageSize);
 
   grid.innerHTML = visible.map(cardTemplate).join("");
   resultMeta.textContent = `Menampilkan ${visible.length} dari ${filtered.length} item`;
+
   btnLoadMore.style.display = visible.length >= filtered.length ? "none" : "inline-flex";
 }
 
-// --- 6) Events ---
-statusSelect.addEventListener("change", () => { page = 1; render(); });
-btnSearch.addEventListener("click", () => { page = 1; render(); });
+// --- 5) Events ---
+statusSelect.addEventListener("change", () => {
+  page = 1;
+  render();
+});
 
+btnSearch.addEventListener("click", () => {
+  page = 1;
+  render();
+});
+
+// Global search
 globalSearchBtn.addEventListener("click", () => {
   currentFilters.q = globalSearch.value.trim();
   page = 1;
@@ -307,8 +293,13 @@ globalSearch.addEventListener("keydown", (e) => {
   }
 });
 
-btnLoadMore.addEventListener("click", () => { page += 1; render(); });
+// Load more
+btnLoadMore.addEventListener("click", () => {
+  page += 1;
+  render();
+});
 
+// Filter kategori sidebar
 document.querySelectorAll(".cat").forEach((btn) => {
   btn.addEventListener("click", () => {
     const cat = btn.getAttribute("data-cat");
@@ -318,18 +309,12 @@ document.querySelectorAll(".cat").forEach((btn) => {
   });
 });
 
-// Logout
-document.getElementById("btnLogout").addEventListener("click", () => {
-  localStorage.removeItem("foundify_auth");
-  window.location.href = "../index.html";
-});
-
-// Klik card -> buka detail
+// Klik card -> detail placeholder
 grid.addEventListener("click", (e) => {
   const card = e.target.closest(".card");
   if (!card) return;
   const id = card.getAttribute("data-id");
-  window.location.href = `./detail.html?id=${encodeURIComponent(id)}`;
+  alert(`Buka detail item ID: ${id} (halaman detail next step)`);
 });
 
 // initial render

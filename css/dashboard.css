@@ -36,6 +36,9 @@ html, body{ height:100%; }
   position: sticky;
   top:0;
   height:100vh;
+
+  /* ✅ update: kalau menu banyak -> bisa scroll */
+  overflow-y: auto;
 }
 
 .sidebar__brand{
@@ -206,7 +209,7 @@ html, body{ height:100%; }
   background: #22c55e;
 }
 
-/* Filters */
+/* ===== Filters ===== */
 .filters{
   margin-top: 14px;
   background: var(--white);
@@ -275,7 +278,7 @@ html, body{ height:100%; }
   font-size: 13px;
 }
 
-/* Grid list (scroll by page) */
+/* ===== Grid list (scroll by page) ===== */
 .grid{
   margin-top: 14px;
   display:grid;
@@ -283,7 +286,7 @@ html, body{ height:100%; }
   gap: 14px;
 }
 
-/* Card item */
+/* ===== Card item ===== */
 .card{
   background: var(--white);
   border: 1px solid var(--border);
@@ -339,17 +342,23 @@ html, body{ height:100%; }
   font-weight: 900;
 }
 
+/* ✅ update: meta dibuat lebih rapat biar bisa 3 baris (lokasi/kategori/desc) */
 .meta{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   gap: 8px;
   color: rgba(15,23,42,.62);
   font-weight: 700;
   font-size: 13px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  line-height: 1.25;
 }
-
 .meta__icon{ opacity:.75; }
+
+/* supaya teks deskripsi nggak mepet banget */
+.meta span{
+  word-break: break-word;
+}
 
 .card__bottom{
   padding-top: 10px;
@@ -374,7 +383,7 @@ html, body{ height:100%; }
   font-weight: 900;
 }
 
-/* Load more */
+/* ===== Load more ===== */
 .loadmore-wrap{
   display:flex;
   justify-content:center;
@@ -395,7 +404,7 @@ html, body{ height:100%; }
   background: rgba(15,23,42,.03);
 }
 
-/* Responsive */
+/* ===== Responsive ===== */
 @media (max-width: 1060px){
   .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sidebar{ width: 240px; }
@@ -409,6 +418,7 @@ html, body{ height:100%; }
     height: auto;
     border-right: none;
     border-bottom: 1px solid var(--border);
+    overflow: visible; /* mobile: sidebar tidak perlu scroll sendiri */
   }
   .grid{ grid-template-columns: 1fr; }
   .filters__meta{ margin-left: 0; width:100%; }
