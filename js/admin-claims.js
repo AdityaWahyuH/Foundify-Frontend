@@ -1,40 +1,13 @@
-function readJSON(key, fallback) {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try { return JSON.parse(raw); } catch { return fallback; }
-}
-function writeJSON(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-function requireAuth() {
-  const auth = readJSON("foundify_auth", null);
-  if (!auth || !auth.token) {
-    window.location.href = "../pages/login.html";
-    return null;
-  }
-  if (auth.role !== "admin") {
-    window.location.href = "./dashboard.html";
-    return null;
-  }
-  return auth;
-}
+import { requireAuth, logout, readJSON, writeJSON, addPoints, pushNotification } from "./utils.js";
 
 const auth = requireAuth();
+if (auth.role !== "admin") window.location.href = "./dashboard.html";
+
 document.getElementById("userPillText").textContent = `${auth.username} (admin)`;
+document.getElementById("btnLogout").addEventListener("click", logout);
 
-document.getElementById("btnLogout").addEventListener("click", () => {
-  localStorage.removeItem("foundify_auth");
-  window.location.href = "../index.html";
-});
-
-function addPoints(username, delta, note) {
-  const points = readJSON("foundify_points", []);
-  points.unshift({ id: Date.now(), username, delta, note, created_at: new Date().toISOString() });
-  writeJSON("foundify_points", points);
-}
-
-function getClaims() { return readJSON("foundify_claims", []); }
+function getClaims(){ return readJSON("foundify_claims", []); }
+function saveClaims(arr){ writeJSON("foundify_claims", arr); }
 
 const claimsList = document.getElementById("claimsList");
 const filterStatus = document.getElementById("filterStatus");
@@ -60,23 +33,25 @@ function render() {
   }
 
   claimsList.innerHTML = claims.map(c => {
-    const img = c.proof_image ? `<img src="${c.proof_image}" alt="bukti">` : "";
+    const img = c.proof_image ? `<img src="${c.proof_image}" alt="bukti" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:10px;">` : "";
     return `
-      <div class="claim" data-id="${c.id}">
-        <div class="top">
-          <div>${c.claimant} <span class="small">(${c.status})</span></div>
-          <div class="small">${new Date(c.created_at).toLocaleString()}</div>
+      <div class="claim" data-id="${c.id}" style="background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:12px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;font-weight:1000;">
+          <div>${c.claimant} <span style="font-size:12px;font-weight:900;color:rgba(15,23,42,.65);">(${c.status})</span></div>
+          <div style="font-size:12px;font-weight:900;color:rgba(15,23,42,.65);">${new Date(c.created_at).toLocaleString()}</div>
         </div>
-        <div class="small" style="margin-top:6px;"><b>Item:</b> ${c.item_title}</div>
-        <div class="small" style="margin-top:6px;"><b>Bukti:</b> ${c.proof_text}</div>
+
+        <div style="margin-top:6px;font-weight:900;color:rgba(15,23,42,.75);"><b>Item:</b> ${c.item_title}</div>
+        <div style="margin-top:6px;font-size:12px;font-weight:900;color:rgba(15,23,42,.65);"><b>Bukti:</b> ${c.proof_text}</div>
         ${img}
+
         ${
           c.status === "PENDING"
-            ? `<div class="actions">
-                 <button class="btn btn--ghost" data-act="reject">Reject</button>
-                 <button class="btn btn--primary" data-act="approve">Approve</button>
-               </div>`
-            : `<div class="small" style="margin-top:10px;">Diverifikasi oleh: <b>${c.verified_by || "-"}</b></div>`
+            ? `<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;">
+                <button class="btn btn--ghost" data-act="reject" style="padding:10px 14px;border-radius:10px;font-weight:1000;border:1px solid rgba(15,23,42,.12);background:#fff;cursor:pointer;">Reject</button>
+                <button class="btn btn--primary" data-act="approve" style="padding:10px 14px;border-radius:10px;font-weight:1000;border:none;background:var(--primary);color:#fff;cursor:pointer;">Approve</button>
+              </div>`
+            : `<div style="margin-top:10px;font-size:12px;font-weight:900;color:rgba(15,23,42,.65);">Diverifikasi oleh: <b>${c.verified_by || "-"}</b></div>`
         }
       </div>
     `;
@@ -103,20 +78,41 @@ claimsList.addEventListener("click", (e) => {
     c.status = "APPROVED";
     c.verified_by = auth.username;
     c.verified_at = new Date().toISOString();
+    claims[idx] = c;
+    saveClaims(claims);
 
-    // Reward ke pelapor item (item_author) — coins default 10 jika belum ada
-    addPoints(c.item_author, 10, `Reward dari klaim item: ${c.item_title}`);
+    // notif claimant
+    pushNotification({
+      to: c.claimant,
+      title: "Klaim Disetujui",
+      message: `Klaim kamu untuk item "${c.item_title}" disetujui admin.`,
+      meta: { type:"claim", status:"APPROVED" }
+    });
+
+    // reward poin ke pelapor item (biasanya penemu saat FOUND)
+    // gunakan coins default 10 jika tidak ada
+    const rewardCoins = Number(c.item_coins || 10);
+    addPoints(c.item_author, rewardCoins, `Reward klaim item: ${c.item_title}`);
+
+    render();
   }
 
   if (act === "reject") {
     c.status = "REJECTED";
     c.verified_by = auth.username;
     c.verified_at = new Date().toISOString();
-  }
+    claims[idx] = c;
+    saveClaims(claims);
 
-  claims[idx] = c;
-  writeJSON("foundify_claims", claims);
-  render();
+    pushNotification({
+      to: c.claimant,
+      title: "Klaim Ditolak",
+      message: `Klaim kamu untuk item "${c.item_title}" ditolak admin.`,
+      meta: { type:"claim", status:"REJECTED" }
+    });
+
+    render();
+  }
 });
 
 document.getElementById("btnRefresh").addEventListener("click", render);

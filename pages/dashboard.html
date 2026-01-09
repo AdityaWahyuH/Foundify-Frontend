@@ -27,15 +27,52 @@
 
       <div class="sidebar__section">
         <div class="sidebar__label">MENU</div>
+
         <a class="navitem navitem--active" href="./dashboard.html">
           <span class="navitem__icon" aria-hidden="true">🏠</span>
           <span>Home</span>
         </a>
 
-        <!-- ✅ FIX: link langsung ke report.html (hapus href="#" dan id btnReport) -->
+        <!-- ✅ Link langsung ke report.html (bukan lagi id btnReport) -->
         <a class="navitem" href="./report.html">
           <span class="navitem__icon" aria-hidden="true">➕</span>
           <span>Buat Laporan / Report</span>
+        </a>
+
+        <a class="navitem" href="./rewards.html">
+          <span class="navitem__icon" aria-hidden="true">🎁</span>
+          <span>Katalog Reward</span>
+        </a>
+
+        <a class="navitem" href="./redemptions.html">
+          <span class="navitem__icon" aria-hidden="true">🧾</span>
+          <span>Riwayat Tukar</span>
+        </a>
+
+        <a class="navitem" href="./points.html">
+          <span class="navitem__icon" aria-hidden="true">🪙</span>
+          <span>Poin Saya</span>
+        </a>
+
+        <a class="navitem" href="./notifications.html">
+          <span class="navitem__icon" aria-hidden="true">🔔</span>
+          <span>Notifikasi</span>
+        </a>
+
+        <!-- Admin menus (hidden by default, shown by JS if role=admin) -->
+        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;">
+          <span class="navitem__icon" aria-hidden="true">✅</span>
+          <span>Verifikasi Klaim</span>
+        </a>
+
+        <a class="navitem" href="./admin-rewards.html" id="adminRewardsLink" style="display:none;">
+          <span class="navitem__icon" aria-hidden="true">🛠️</span>
+          <span>Admin Reward</span>
+        </a>
+
+        <a class="navitem" href="./admin-redemptions.html" id="adminRedeemLink" style="display:none;">
+          <span class="navitem__icon" aria-hidden="true">🧾</span>
+          <span>Verifikasi Penukaran</span>
         </a>
       </div>
 
@@ -100,7 +137,7 @@
           </svg>
         </button>
 
-        <!-- ✅ DROPDOWN STATUS (VALUE BENAR) -->
+        <!-- ✅ Dropdown status: value konsisten ALL/LOST/FOUND -->
         <select id="statusSelect" class="select">
           <option value="ALL">All Status</option>
           <option value="LOST">Lost</option>
@@ -126,6 +163,7 @@
     </main>
   </div>
 
-  <script src="../js/dashboard.js"></script>
+  <!-- ✅ module karena dashboard.js import utils.js -->
+  <script type="module" src="../js/dashboard.js"></script>
 </body>
 </html>

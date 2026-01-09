@@ -1,48 +1,87 @@
-function readJSON(key, fallback) {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try { return JSON.parse(raw); } catch { return fallback; }
-}
+// ===== Points Page Logic - Foundify =====
+import {
+  requireAuth,
+  logout,
+  readJSON,
+  getTotalPoints
+} from "./utils.js";
 
-function requireAuth() {
-  const auth = readJSON("foundify_auth", null);
-  if (!auth || !auth.token) {
-    window.location.href = "../pages/login.html";
-    return null;
-  }
-  return auth;
-}
-
+// --- Auth Guard ---
 const auth = requireAuth();
-document.getElementById("userPillText").textContent = `${auth.username} (${auth.role})`;
+if (!auth) return;
 
+// --- Topbar user ---
+const userPillText = document.getElementById("userPillText");
+if (userPillText) {
+  userPillText.textContent = `${auth.username} (${auth.role})`;
+}
+
+// --- Logout ---
+const btnLogout = document.getElementById("btnLogout");
+if (btnLogout) {
+  btnLogout.addEventListener("click", logout);
+}
+
+// --- Tampilkan menu admin jika role admin ---
 if (auth.role === "admin") {
-  document.getElementById("adminClaimsLink").style.display = "flex";
+  const adminClaims = document.getElementById("adminClaimsLink");
+  const adminRewards = document.getElementById("adminRewardsLink");
+  const adminRedeem = document.getElementById("adminRedeemLink");
+
+  if (adminClaims) adminClaims.style.display = "flex";
+  if (adminRewards) adminRewards.style.display = "flex";
+  if (adminRedeem) adminRedeem.style.display = "flex";
 }
 
-document.getElementById("btnLogout").addEventListener("click", () => {
-  localStorage.removeItem("foundify_auth");
-  window.location.href = "../index.html";
-});
-
+// --- Ambil data poin ---
 const points = readJSON("foundify_points", []);
-const my = points.filter(p => p.username === auth.username);
+const myPoints = points.filter(p => p.username === auth.username);
 
-const total = my.reduce((sum, p) => sum + Number(p.delta || 0), 0);
-document.getElementById("totalPoints").textContent = total;
-document.getElementById("totalHistory").textContent = my.length;
+// --- Ringkasan ---
+const totalPointsEl = document.getElementById("totalPoints");
+const totalHistoryEl = document.getElementById("totalHistory");
 
-const list = document.getElementById("pointsList");
-if (my.length === 0) {
-  list.innerHTML = `<div style="background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:12px;padding:12px;font-weight:900;color:rgba(15,23,42,.6);">Belum ada riwayat poin.</div>`;
-} else {
-  list.innerHTML = my.map(p => `
-    <div class="point">
-      <div>
-        <div style="font-weight:900;">${p.note || "-"}</div>
-        <div class="small">${new Date(p.created_at).toLocaleString()}</div>
-      </div>
-      <div class="delta">+${p.delta}</div>
-    </div>
-  `).join("");
+if (totalPointsEl) {
+  totalPointsEl.textContent = getTotalPoints(auth.username);
 }
+
+if (totalHistoryEl) {
+  totalHistoryEl.textContent = myPoints.length;
+}
+
+// --- List Riwayat ---
+const listEl = document.getElementById("pointsList");
+
+function renderHistory() {
+  if (!listEl) return;
+
+  if (myPoints.length === 0) {
+    listEl.innerHTML = `
+      <div class="cardx">
+        <div class="label">Riwayat Poin</div>
+        <div class="small">Belum ada riwayat poin.</div>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = myPoints
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(p => `
+      <div class="point">
+        <div>
+          <div style="font-weight:900;">${p.note || "-"}</div>
+          <div class="small">
+            ${new Date(p.created_at).toLocaleString()}
+          </div>
+        </div>
+        <div class="delta">
+          ${p.delta > 0 ? "+" : ""}${p.delta}
+        </div>
+      </div>
+    `)
+    .join("");
+}
+
+// --- Initial Render ---
+renderHistory();

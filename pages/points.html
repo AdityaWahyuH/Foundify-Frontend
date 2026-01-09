@@ -3,53 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Poin - Foundify</title>
+  <title>Poin Saya - Foundify</title>
 
+  <!-- Global dashboard style -->
   <link rel="stylesheet" href="../css/dashboard.css" />
+
+  <!-- Points page style -->
   <link rel="stylesheet" href="../css/points.css" />
 </head>
+
 <body class="dash-body">
   <div class="layout">
-    <aside class="sidebar">
-      <div class="sidebar__brand"><div class="brand__text">Foundify</div></div>
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="sidebar__brand">
+        <div class="brand__text">Foundify</div>
+      </div>
+
       <hr class="sidebar__hr" />
+
       <div class="sidebar__section">
         <div class="sidebar__label">MENU</div>
-        <a class="navitem" href="./dashboard.html"><span class="navitem__icon">🏠</span><span>Home</span></a>
-        <a class="navitem" href="./report.html"><span class="navitem__icon">➕</span><span>Buat Laporan</span></a>
-        <a class="navitem navitem--active" href="./points.html"><span class="navitem__icon">🪙</span><span>Poin Saya</span></a>
-        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;"><span class="navitem__icon">✅</span><span>Verifikasi Klaim</span></a>
+
+        <a class="navitem" href="./dashboard.html">
+          <span class="navitem__icon" aria-hidden="true">🏠</span>
+          <span>Home</span>
+        </a>
+
+        <a class="navitem" href="./report.html">
+          <span class="navitem__icon" aria-hidden="true">➕</span>
+          <span>Buat Laporan</span>
+        </a>
+
+        <a class="navitem" href="./rewards.html">
+          <span class="navitem__icon" aria-hidden="true">🎁</span>
+          <span>Katalog Reward</span>
+        </a>
+
+        <a class="navitem" href="./redemptions.html">
+          <span class="navitem__icon" aria-hidden="true">🧾</span>
+          <span>Riwayat Tukar</span>
+        </a>
+
+        <a class="navitem navitem--active" href="./points.html">
+          <span class="navitem__icon" aria-hidden="true">🪙</span>
+          <span>Poin Saya</span>
+        </a>
+
+        <a class="navitem" href="./notifications.html">
+          <span class="navitem__icon" aria-hidden="true">🔔</span>
+          <span>Notifikasi</span>
+        </a>
       </div>
+
+      <div class="sidebar__section">
+        <div class="sidebar__label">ADMIN</div>
+
+        <!-- Default disembunyikan, JS akan munculkan jika role=admin -->
+        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;">
+          <span class="navitem__icon" aria-hidden="true">✅</span>
+          <span>Verifikasi Klaim</span>
+        </a>
+
+        <a class="navitem" href="./admin-rewards.html" id="adminRewardsLink" style="display:none;">
+          <span class="navitem__icon" aria-hidden="true">🛠️</span>
+          <span>Admin Reward</span>
+        </a>
+
+        <a class="navitem" href="./admin-redemptions.html" id="adminRedeemLink" style="display:none;">
+          <span class="navitem__icon" aria-hidden="true">🧾</span>
+          <span>Verifikasi Penukaran</span>
+        </a>
+      </div>
+
       <div class="sidebar__footer">
         <button class="logout" id="btnLogout" type="button">Logout</button>
       </div>
     </aside>
 
-    <main class="main">
+    <!-- Main -->
+    <main class="main" aria-label="Konten utama">
+      <!-- Topbar -->
       <header class="topbar">
         <div class="topbar__title">Poin Saya</div>
+
         <div class="topbar__right">
-          <div class="userpill"><span class="userpill__dot"></span><span id="userPillText"></span></div>
+          <div class="userpill" id="userPill" title="Akun yang sedang login">
+            <span class="userpill__dot"></span>
+            <span id="userPillText">user</span>
+          </div>
         </div>
       </header>
 
-      <section class="points-wrap">
-        <div class="points-summary">
-          <div class="box">
+      <!-- Content -->
+      <section class="points-wrap" aria-label="Ringkasan Poin">
+        <div class="cards">
+          <div class="cardx">
             <div class="label">Total Poin</div>
             <div class="value" id="totalPoints">0</div>
           </div>
-          <div class="box">
-            <div class="label">Riwayat</div>
+
+          <div class="cardx">
+            <div class="label">Total Riwayat</div>
             <div class="value" id="totalHistory">0</div>
           </div>
         </div>
 
-        <div class="points-list" id="pointsList"></div>
+        <section class="points-list" id="pointsList" aria-label="Riwayat Poin">
+          <!-- Diisi oleh points.js -->
+        </section>
       </section>
     </main>
   </div>
 
-  <script src="../js/points.js"></script>
+  <!-- ✅ WAJIB: module karena points.js import utils.js -->
+  <script type="module" src="../js/points.js"></script>
 </body>
 </html>
