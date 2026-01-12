@@ -1,17 +1,39 @@
-// ===== Foundify Utilities (localStorage + auth + notify) =====
+// ===== Utils - Foundify (Shared FINAL) =====
 
+/* ======================================================
+   1) Storage Helpers
+====================================================== */
 export function readJSON(key, fallback) {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try { return JSON.parse(raw); } catch { return fallback; }
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    console.warn("readJSON error:", key);
+    return fallback;
+  }
 }
 
 export function writeJSON(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+export function nowISO() {
+  return new Date().toISOString();
+}
+
+
+/* ======================================================
+   2) Auth Helpers
+====================================================== */
 export function getAuth() {
-  return readJSON("foundify_auth", null);
+  const raw = localStorage.getItem("foundify_auth");
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
 
 export function requireAuth(redirect = "../pages/login.html") {
@@ -28,16 +50,65 @@ export function logout() {
   window.location.href = "../index.html";
 }
 
+
+/* ======================================================
+   3) Points System (GLOBAL)
+====================================================== */
+export function getTotalPoints(username) {
+  const list = readJSON("foundify_points", []);
+  return list
+    .filter(p => p.username === username)
+    .reduce((sum, p) => sum + Number(p.delta || 0), 0);
+}
+
+/**
+ * Tambah riwayat poin (positif / negatif)
+ */
+export function addPointHistory(username, delta, note = "-") {
+  const list = readJSON("foundify_points", []);
+  list.unshift({
+    id: `PTS-${Date.now()}`,
+    username,
+    delta: Number(delta),
+    note,
+    created_at: nowISO()
+  });
+  writeJSON("foundify_points", list);
+  return true;
+}
+
+/**
+ * Kurangi poin user (dipakai saat redeem)
+ */
+export function spendPoints(username, amount, note) {
+  const total = getTotalPoints(username);
+  const cost = Number(amount || 0);
+
+  if (total < cost) return false;
+
+  addPointHistory(
+    username,
+    -Math.abs(cost),
+    note || "Penukaran reward"
+  );
+
+  return true;
+}
+
+
+/* ======================================================
+   4) Notifications (Optional tapi siap pakai)
+====================================================== */
 export function pushNotification({ to, title, message, meta = {} }) {
   const list = readJSON("foundify_notifications", []);
   list.unshift({
-    id: Date.now(),
+    id: `NTF-${Date.now()}`,
     to,
     title,
     message,
     meta,
     is_read: false,
-    created_at: new Date().toISOString()
+    created_at: nowISO()
   });
   writeJSON("foundify_notifications", list);
 }
@@ -53,33 +124,17 @@ export function getUnreadCount(username) {
 
 export function markAllRead(username) {
   const list = readJSON("foundify_notifications", []);
-  const updated = list.map(n => (n.to === username ? { ...n, is_read: true } : n));
+  const updated = list.map(n =>
+    n.to === username ? { ...n, is_read: true } : n
+  );
   writeJSON("foundify_notifications", updated);
 }
 
-export function addPoints(username, delta, note) {
-  const points = readJSON("foundify_points", []);
-  points.unshift({
-    id: Date.now(),
-    username,
-    delta: Number(delta),
-    note,
-    created_at: new Date().toISOString()
-  });
-  writeJSON("foundify_points", points);
 
-  // notif poin
-  pushNotification({
-    to: username,
-    title: "Update Poin",
-    message: `${note} (${delta > 0 ? "+" : ""}${delta} poin)`,
-    meta: { type: "points" }
-  });
-}
-
-export function getTotalPoints(username) {
-  const points = readJSON("foundify_points", []);
-  return points
-    .filter(p => p.username === username)
-    .reduce((sum, p) => sum + Number(p.delta || 0), 0);
+/* ======================================================
+   5) Safety Seeder (Optional)
+====================================================== */
+export function ensureArray(key) {
+  const val = readJSON(key, null);
+  if (!Array.isArray(val)) writeJSON(key, []);
 }
