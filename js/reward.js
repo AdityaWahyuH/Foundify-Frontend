@@ -1,84 +1,123 @@
 import {
-  requireAuth, logout, readJSON, writeJSON,
-  getTotalPoints, addPoints, pushNotification
+  requireAuth,
+  logout,
+  readJSON,
+  writeJSON,
+  getTotalPoints,
+  addPointHistory,
+  nowISO
 } from "./utils.js";
 
+/* ===============================
+   1) AUTH + HEADER
+================================ */
 const auth = requireAuth();
-document.getElementById("userPillText").textContent = `${auth.username} (${auth.role})`;
-document.getElementById("btnLogout").addEventListener("click", logout);
+if (!auth) throw new Error("Unauthorized");
+
+document.getElementById("btnLogout")?.addEventListener("click", logout);
+
+const userPillText = document.getElementById("userPillText");
+if (userPillText) {
+  userPillText.textContent = `${auth.username} (${auth.role})`;
+}
 
 if (auth.role === "admin") {
-  const a1 = document.getElementById("adminClaimsLink");
-  const a2 = document.getElementById("adminRewardsLink");
-  const a3 = document.getElementById("adminRedeemLink");
-  if (a1) a1.style.display = "flex";
-  if (a2) a2.style.display = "flex";
-  if (a3) a3.style.display = "flex";
+  document.getElementById("adminClaimsLink")?.style.setProperty("display", "flex");
+  document.getElementById("adminRewardsLink")?.style.setProperty("display", "flex");
+  document.getElementById("adminRedeemLink")?.style.setProperty("display", "flex");
 }
 
-const grid = document.getElementById("grid");
+/* ===============================
+   2) DOM
+================================ */
+const grid = document.getElementById("rewardsGrid");
+const meta = document.getElementById("rewardMeta");
 const myPointsEl = document.getElementById("myPoints");
-const qEl = document.getElementById("q");
-const sortEl = document.getElementById("sort");
-const toast = document.getElementById("toast");
 
-function seedRewardsIfEmpty() {
-  const rewards = readJSON("foundify_rewards", []);
-  if (rewards.length > 0) return;
+const searchInput = document.getElementById("rewardSearch");
+const searchBtn = document.getElementById("rewardSearchBtn");
+const catSelect = document.getElementById("rewardCategory");
+const sortSelect = document.getElementById("rewardSort");
 
-  const seed = [
-    { id: Date.now()+1, name:"Voucher Kantin 10k", desc:"Voucher makan di kantin kampus senilai Rp10.000.", price:50, stock:20, image:null, created_at:new Date().toISOString() },
-    { id: Date.now()+2, name:"Pulpen Premium", desc:"Pulpen premium untuk kebutuhan catatan sehari-hari.", price:40, stock:15, image:null, created_at:new Date().toISOString() },
-    { id: Date.now()+3, name:"Tumbler Foundify", desc:"Tumbler eksklusif Foundify (limited edition).", price:120, stock:8, image:null, created_at:new Date().toISOString() },
-    { id: Date.now()+4, name:"Voucher Parkir 1 Minggu", desc:"Gratis parkir selama 1 minggu (sesuai ketentuan).", price:150, stock:5, image:null, created_at:new Date().toISOString() },
-    { id: Date.now()+5, name:"Merch Kaos", desc:"Kaos Foundify, ukuran bisa pilih saat penukaran disetujui.", price:200, stock:6, image:null, created_at:new Date().toISOString() },
-  ];
-  writeJSON("foundify_rewards", seed);
-}
+/* ===============================
+   3) STATE
+================================ */
+let q = "";
+let cat = "ALL";
+let sort = "POPULAR";
 
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.style.display = "block";
-  setTimeout(()=> toast.style.display = "none", 1600);
-}
-
+/* ===============================
+   4) STORAGE
+================================ */
 function getRewards() {
   return readJSON("foundify_rewards", []);
 }
-
-function getRedemptions() {
-  return readJSON("foundify_redemptions", []);
+function saveRewards(list) {
+  writeJSON("foundify_rewards", list);
 }
 
-function setMyPoints() {
-  myPointsEl.textContent = getTotalPoints(auth.username);
+/* ===============================
+   5) HELPERS
+================================ */
+function refreshPoints() {
+  if (myPointsEl) {
+    myPointsEl.textContent = getTotalPoints(auth.username);
+  }
 }
 
-function rewardCard(r) {
-  const points = getTotalPoints(auth.username);
-  const can = points >= r.price && r.stock > 0;
+function matchReward(r) {
+  const qq = q.toLowerCase().trim();
+
+  const okQ = qq
+    ? r.name.toLowerCase().includes(qq) ||
+      r.desc.toLowerCase().includes(qq) ||
+      r.category.toLowerCase().includes(qq)
+    : true;
+
+  const okCat = cat === "ALL" ? true : r.category === cat;
+  return okQ && okCat;
+}
+
+function sortRewards(list) {
+  const arr = [...list];
+  if (sort === "CHEAPEST") arr.sort((a, b) => a.cost - b.cost);
+  else if (sort === "EXPENSIVE") arr.sort((a, b) => b.cost - a.cost);
+  else if (sort === "NAME") arr.sort((a, b) => a.name.localeCompare(b.name));
+  else {
+    // POPULAR (dummy)
+    arr.sort((a, b) => (b.stock * 2 - b.cost) - (a.stock * 2 - a.cost));
+  }
+  return arr;
+}
+
+/* ===============================
+   6) CARD TEMPLATE (FIX)
+================================ */
+function cardTemplate(r) {
+  const myPts = getTotalPoints(auth.username);
+  const canRedeem = myPts >= r.cost && r.stock > 0;
+
+  const img = r.image
+    ? `<img src="${r.image}" alt="${r.name}" />`
+    : `<span class="emoji">🎁</span>`;
 
   return `
     <article class="reward" data-id="${r.id}">
-      <div class="thumb">
-        ${
-          r.image
-            ? `<img src="${r.image}" alt="reward">`
-            : `<div style="font-weight:1000;color:rgba(15,23,42,.55);">Reward</div>`
-        }
-      </div>
-      <div class="body">
-        <h3 class="name">${r.name}</h3>
-        <p class="desc">${r.desc}</p>
+      <div class="reward__img">${img}</div>
 
-        <div class="row">
-          <div class="price">${r.price} poin</div>
-          <div class="small">Stok: ${r.stock}</div>
+      <div class="reward__body">
+        <div class="reward__top">
+          <span class="tag">${r.category}</span>
+          <span class="points">${r.cost} Poin</span>
         </div>
 
-        <div class="row">
-          <button class="btn btn--primary" data-act="redeem" ${can ? "" : "disabled"}>
-            Tukar
+        <h3 class="reward__title">${r.name}</h3>
+        <p class="reward__desc">${r.desc}</p>
+
+        <div class="reward__foot">
+          <span>Stok: <b>${r.stock}</b></span>
+          <button class="btnRedeem" ${canRedeem ? "" : "disabled"}>
+            ${r.stock <= 0 ? "Habis" : canRedeem ? "Tukar" : "Poin Kurang"}
           </button>
         </div>
       </div>
@@ -86,81 +125,97 @@ function rewardCard(r) {
   `;
 }
 
+/* ===============================
+   7) RENDER
+================================ */
 function render() {
-  setMyPoints();
-  let rewards = getRewards();
+  const rewards = getRewards();
+  const filtered = rewards.filter(matchReward);
+  const sorted = sortRewards(filtered);
 
-  const qq = qEl.value.trim().toLowerCase();
-  if (qq) {
-    rewards = rewards.filter(r =>
-      (r.name || "").toLowerCase().includes(qq) ||
-      (r.desc || "").toLowerCase().includes(qq)
-    );
-  }
+  if (meta) meta.textContent = `Menampilkan ${sorted.length} reward`;
 
-  const sort = sortEl.value;
-  if (sort === "NEW") rewards.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
-  if (sort === "CHEAP") rewards.sort((a,b)=> a.price - b.price);
-  if (sort === "EXP") rewards.sort((a,b)=> b.price - a.price);
-
-  if (rewards.length === 0) {
-    grid.innerHTML = `<div style="background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:12px;padding:12px;font-weight:1000;color:rgba(15,23,42,.6);">Reward tidak ditemukan.</div>`;
-    return;
-  }
-
-  grid.innerHTML = rewards.map(rewardCard).join("");
+  if (!grid) return;
+  grid.innerHTML = sorted.map(cardTemplate).join("");
 }
 
-function redeem(rewardId) {
+/* ===============================
+   8) REDEEM FLOW
+================================ */
+function redeem(id) {
   const rewards = getRewards();
-  const idx = rewards.findIndex(r => String(r.id) === String(rewardId));
+  const idx = rewards.findIndex(r => String(r.id) === String(id));
   if (idx === -1) return;
 
   const r = rewards[idx];
-  const points = getTotalPoints(auth.username);
+  const myPts = getTotalPoints(auth.username);
 
-  if (r.stock <= 0) return showToast("Stok habis.");
-  if (points < r.price) return showToast("Poin tidak cukup.");
+  if (myPts < r.cost) return alert("Poin kamu belum cukup.");
+  if (r.stock <= 0) return alert("Stok reward habis.");
 
-  // Buat request penukaran -> butuh verifikasi admin (sesuai use case)
-  const redemptions = getRedemptions();
-  redemptions.unshift({
-    id: Date.now(),
+  const ok = confirm(`Tukar "${r.name}" dengan ${r.cost} poin?`);
+  if (!ok) return;
+
+  // Kurangi poin
+  addPointHistory(auth.username, -r.cost, `Tukar reward: ${r.name}`);
+
+  // Kurangi stok
+  rewards[idx].stock -= 1;
+  saveRewards(rewards);
+
+  // Simpan riwayat penukaran
+  const history = readJSON("foundify_redemptions", []);
+  history.push({
+    id: `REDEEM-${Date.now()}`,
     username: auth.username,
     reward_id: r.id,
     reward_name: r.name,
-    price: r.price,
-    status: "PENDING",          // PENDING/APPROVED/REJECTED
-    created_at: new Date().toISOString(),
-    verified_by: null,
-    verified_at: null,
+    cost: r.cost,
+    status: "PENDING",
+    created_at: nowISO()
   });
-  writeJSON("foundify_redemptions", redemptions);
+  writeJSON("foundify_redemptions", history);
 
-  // notif ke admin
-  pushNotification({
-    to: "superadmin",
-    title: "Penukaran Reward Baru",
-    message: `${auth.username} mengajukan penukaran: ${r.name} (${r.price} poin).`,
-    meta: { type:"redeem", redemption_id: redemptions[0].id }
-  });
-
-  showToast("Permintaan tukar dikirim (menunggu verifikasi admin) ✅");
+  alert("Reward berhasil ditukar. Menunggu verifikasi admin.");
+  refreshPoints();
   render();
 }
 
-grid.addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
+/* ===============================
+   9) EVENTS
+================================ */
+searchBtn?.addEventListener("click", () => {
+  q = searchInput.value || "";
+  render();
+});
+
+searchInput?.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    q = searchInput.value || "";
+    render();
+  }
+});
+
+catSelect?.addEventListener("change", () => {
+  cat = catSelect.value || "ALL";
+  render();
+});
+
+sortSelect?.addEventListener("change", () => {
+  sort = sortSelect.value || "POPULAR";
+  render();
+});
+
+grid?.addEventListener("click", e => {
+  const btn = e.target.closest(".btnRedeem");
   if (!btn) return;
   const card = e.target.closest(".reward");
   if (!card) return;
-  const id = card.getAttribute("data-id");
-  const act = btn.getAttribute("data-act");
-  if (act === "redeem") redeem(id);
+  redeem(card.dataset.id);
 });
 
-qEl.addEventListener("input", render);
-sortEl.addEventListener("change", render);
-
-seedRewardsIfEmpty();
+/* ===============================
+   INIT
+================================ */
+refreshPoints();
 render();

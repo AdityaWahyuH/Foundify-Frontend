@@ -5,26 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Katalog Reward - Foundify</title>
 
+  <!-- Base dashboard style -->
   <link rel="stylesheet" href="../css/dashboard.css" />
+  <!-- Reward specific style -->
   <link rel="stylesheet" href="../css/rewards.css" />
 </head>
+
 <body class="dash-body">
   <div class="layout">
-    <aside class="sidebar">
-      <div class="sidebar__brand"><div class="brand__text">Foundify</div></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="sidebar__brand">
+        <div class="brand__text">Foundify</div>
+      </div>
+
       <hr class="sidebar__hr" />
+
       <div class="sidebar__section">
         <div class="sidebar__label">MENU</div>
-        <a class="navitem" href="./dashboard.html"><span class="navitem__icon">🏠</span><span>Home</span></a>
-        <a class="navitem" href="./report.html"><span class="navitem__icon">➕</span><span>Buat Laporan</span></a>
-        <a class="navitem navitem--active" href="./rewards.html"><span class="navitem__icon">🎁</span><span>Katalog Reward</span></a>
-        <a class="navitem" href="./redemptions.html"><span class="navitem__icon">🧾</span><span>Riwayat Tukar</span></a>
-        <a class="navitem" href="./points.html"><span class="navitem__icon">🪙</span><span>Poin Saya</span></a>
-        <a class="navitem" href="./notifications.html"><span class="navitem__icon">🔔</span><span>Notifikasi</span></a>
 
-        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;"><span class="navitem__icon">✅</span><span>Verifikasi Klaim</span></a>
-        <a class="navitem" href="./admin-rewards.html" id="adminRewardsLink" style="display:none;"><span class="navitem__icon">🛠️</span><span>Admin Reward</span></a>
-        <a class="navitem" href="./admin-redemptions.html" id="adminRedeemLink" style="display:none;"><span class="navitem__icon">🧾</span><span>Verifikasi Penukaran</span></a>
+        <a class="navitem" href="./dashboard.html">
+          <span class="navitem__icon">🏠</span>
+          <span>Home</span>
+        </a>
+
+        <a class="navitem" href="./report.html">
+          <span class="navitem__icon">➕</span>
+          <span>Buat Laporan</span>
+        </a>
+
+        <a class="navitem navitem--active" href="./rewards.html">
+          <span class="navitem__icon">🎁</span>
+          <span>Katalog Reward</span>
+        </a>
+
+        <a class="navitem" href="./redemptions.html">
+          <span class="navitem__icon">🧾</span>
+          <span>Riwayat Tukar</span>
+        </a>
+
+        <a class="navitem" href="./points.html">
+          <span class="navitem__icon">🪙</span>
+          <span>Poin Saya</span>
+        </a>
+
+        <a class="navitem" href="./notifications.html">
+          <span class="navitem__icon">🔔</span>
+          <span>Notifikasi</span>
+        </a>
+      </div>
+
+      <div class="sidebar__section">
+        <div class="sidebar__label">ADMIN</div>
+
+        <a class="navitem" href="./admin-claims.html" id="adminClaimsLink" style="display:none;">
+          <span class="navitem__icon">✅</span>
+          <span>Verifikasi Klaim</span>
+        </a>
+
+        <a class="navitem" href="./admin-rewards.html" id="adminRewardsLink" style="display:none;">
+          <span class="navitem__icon">🛠️</span>
+          <span>Admin Reward</span>
+        </a>
+
+        <a class="navitem" href="./admin-redemptions.html" id="adminRedeemLink" style="display:none;">
+          <span class="navitem__icon">🧾</span>
+          <span>Verifikasi Penukaran</span>
+        </a>
       </div>
 
       <div class="sidebar__footer">
@@ -32,34 +80,67 @@
       </div>
     </aside>
 
-    <main class="main">
+    <!-- ===== MAIN ===== -->
+    <main class="main" aria-label="Konten utama">
+
+      <!-- Topbar -->
       <header class="topbar">
         <div class="topbar__title">Katalog Reward</div>
+
         <div class="topbar__right">
           <div class="pill">
-            <div class="small">Poin Anda</div>
-            <div class="big" id="myPoints">0</div>
+            <span class="pill__label">Poin kamu</span>
+            <span class="pill__value" id="myPoints">0</span>
           </div>
-          <div class="userpill"><span class="userpill__dot"></span><span id="userPillText"></span></div>
+
+          <div class="userpill" title="Akun yang sedang login">
+            <span class="userpill__dot"></span>
+            <span id="userPillText">user</span>
+          </div>
         </div>
       </header>
 
-      <section class="reward-wrap">
-        <div class="toolbar">
-          <input id="q" class="inputx" placeholder="Cari reward..." />
-          <select id="sort" class="select">
-            <option value="NEW">Terbaru</option>
-            <option value="CHEAP">Poin termurah</option>
-            <option value="EXP">Poin termahal</option>
-          </select>
+      <!-- Controls -->
+      <section class="rewards-controls" aria-label="Kontrol Reward">
+        <div class="searchbox">
+          <input
+            id="rewardSearch"
+            type="text"
+            placeholder="Cari reward... (contoh: voucher, kopi, hoodie)"
+          />
+          <button id="rewardSearchBtn" type="button">Cari</button>
         </div>
 
-        <section id="grid" class="reward-grid"></section>
-        <div class="toast" id="toast"></div>
+        <select id="rewardCategory" class="select">
+          <option value="ALL">Semua Kategori</option>
+          <option value="Voucher">Voucher</option>
+          <option value="Makanan & Minuman">Makanan & Minuman</option>
+          <option value="Merchandise">Merchandise</option>
+          <option value="Transport">Transport</option>
+          <option value="Donasi">Donasi</option>
+        </select>
+
+        <select id="rewardSort" class="select">
+          <option value="POPULAR">Paling Populer</option>
+          <option value="CHEAPEST">Poin Termurah</option>
+          <option value="EXPENSIVE">Poin Tertinggi</option>
+          <option value="NAME">Nama A-Z</option>
+        </select>
+
+        <div class="filters__meta" id="rewardMeta"></div>
       </section>
+
+      <!-- Reward Grid -->
+      <section
+        class="rewards-grid"
+        id="rewardsGrid"
+        aria-label="Daftar Reward">
+      </section>
+
     </main>
   </div>
 
+  <!-- JS -->
   <script type="module" src="../js/rewards.js"></script>
 </body>
 </html>
