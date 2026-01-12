@@ -207,7 +207,7 @@ claimForm.addEventListener("submit", (e) => {
   proofBase64 = null;
   proofImg.style.display = "none";
 
-  showToast("Klaim terkirim ✅ (menunggu verifikasi admin)");
+  showToast("Klaim terkirim (menunggu verifikasi admin)");
   if (auth.role === "admin") renderAdminClaims();
 });
 

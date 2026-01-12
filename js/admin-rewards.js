@@ -115,7 +115,7 @@ form.addEventListener("submit", (e) => {
       created_at: new Date().toISOString()
     });
     saveRewards(rewards);
-    showToast("Reward ditambahkan ✅");
+    showToast("Reward ditambahkan");
   } else {
     const idx = rewards.findIndex(r => r.id === id);
     if (idx === -1) return;
@@ -130,7 +130,7 @@ form.addEventListener("submit", (e) => {
       image: imageBase64 ?? old.image
     };
     saveRewards(rewards);
-    showToast("Reward diupdate ✅");
+    showToast("Reward diupdate");
   }
 
   resetForm();
@@ -170,7 +170,7 @@ listEl.addEventListener("click", (e) => {
     rewards.splice(idx, 1);
     saveRewards(rewards);
     render();
-    showToast("Reward dihapus ✅");
+    showToast("Reward dihapus ");
   }
 });
 

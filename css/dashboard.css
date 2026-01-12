@@ -37,7 +37,7 @@ html, body{ height:100%; }
   top:0;
   height:100vh;
 
-  /* ✅ update: kalau menu banyak -> bisa scroll */
+  /* update: kalau menu banyak bisa di scroll */
   overflow-y: auto;
 }
 
@@ -342,7 +342,7 @@ html, body{ height:100%; }
   font-weight: 900;
 }
 
-/* ✅ update: meta dibuat lebih rapat biar bisa 3 baris (lokasi/kategori/desc) */
+/* update: meta dibuat lebih rapat biar bisa 3 baris (lokasi/kategori/desc) */
 .meta{
   display:flex;
   align-items:flex-start;
@@ -355,7 +355,7 @@ html, body{ height:100%; }
 }
 .meta__icon{ opacity:.75; }
 
-/* supaya teks deskripsi nggak mepet banget */
+
 .meta span{
   word-break: break-word;
 }
@@ -418,7 +418,7 @@ html, body{ height:100%; }
     height: auto;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    overflow: visible; /* mobile: sidebar tidak perlu scroll sendiri */
+    overflow: visible; 
   }
   .grid{ grid-template-columns: 1fr; }
   .filters__meta{ margin-left: 0; width:100%; }

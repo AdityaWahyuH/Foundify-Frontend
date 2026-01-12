@@ -159,7 +159,7 @@ form.addEventListener("submit", (e) => {
   reports.unshift(report);
   saveReports(reports);
 
-  showToast("Laporan berhasil dibuat ✅");
+  showToast("Laporan berhasil dibuat");
 
   setTimeout(() => {
     window.location.href = "../pages/dashboard.html";

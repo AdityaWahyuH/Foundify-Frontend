@@ -6,7 +6,7 @@
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
-/* top bar (judul kiri + search kanan) */
+/* judul kiri + search kanan) */
 .topbar {
   height: 64px;
   display: flex;

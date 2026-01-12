@@ -145,7 +145,7 @@ function redeem(rewardId) {
     meta: { type:"redeem", redemption_id: redemptions[0].id }
   });
 
-  showToast("Permintaan tukar dikirim (menunggu verifikasi admin) ✅");
+  showToast("Permintaan tukar dikirim (menunggu verifikasi admin)");
   render();
 }
 

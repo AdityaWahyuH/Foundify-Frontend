@@ -180,7 +180,7 @@ function applyFilters(items) {
   return items.filter((it) => {
     const itemStatus = (it.status || "").toUpperCase();
 
-    // ✅ Status filter fix
+    // Status filter fix
     const okStatus = statusFilter === "ALL" ? true : itemStatus === statusFilter;
 
     // lokasi
